@@ -1,36 +1,21 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { useState } from 'react'
-import './App.css'
+// 主应用组件
+import React from 'react';
+import { Provider } from 'react-redux';
+import { configureAppStore } from './core/store';
+import RouterConfig from './core/router/RouterConfig';
+import './App.css';
 
-function App() {
-    const [count, setCount] = useState(0)
+// 配置Redux store
+const store = configureAppStore();
 
+const App: React.FC = () => {
     return (
-        <Router>
+        <Provider store={store}>
             <div className="App">
-                <header className="App-header">
-                    <h1>AI旅行规划师</h1>
-                    <p>欢迎使用AI旅行规划师应用</p>
-                    <div className="card">
-                        <button onClick={() => setCount((count) => count + 1)}>
-                            点击次数: {count}
-                        </button>
-                        <p>
-                            编辑 <code>src/App.tsx</code> 并保存以测试热重载
-                        </p>
-                    </div>
-                </header>
-
-                <Routes>
-                    <Route path="/" element={
-                        <main>
-                            <p>这是主页内容</p>
-                        </main>
-                    } />
-                </Routes>
+                <RouterConfig />
             </div>
-        </Router>
-    )
-}
+        </Provider>
+    );
+};
 
-export default App
+export default App;
