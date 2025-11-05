@@ -1,76 +1,62 @@
-import express from 'express'
-import cors from 'cors'
-import helmet from 'helmet'
-import compression from 'compression'
-import rateLimit from 'express-rate-limit'
 import dotenv from 'dotenv'
+import { environment } from './core/config/index.js'
+import appConfig from './core/app/index.js'
+import { setupDatabase } from './core/database/index.js'
+import { createLogger } from './core/utils/index.js'
+
+// 创建日志记录器
+const logger = createLogger('Server')
 
 // 加载环境变量
 dotenv.config()
 
-const app = express()
-const PORT = process.env.PORT || 5000
+async function bootstrap() {
+    try {
+        logger.info('正在启动AI旅行规划师后端服务...')
 
-// 中间件配置
-app.use(helmet())
-app.use(compression())
-app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true
-}))
+        // 验证环境变量
+        environment.validate()
+        logger.info('环境变量验证通过')
 
-// 速率限制
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15分钟
-    max: 100 // 限制每个IP每15分钟最多100个请求
-})
-app.use(limiter)
+        // 创建Express应用
+        const app = appConfig.createExpressApp()
 
-// 解析JSON请求体
-app.use(express.json({ limit: '10mb' }))
-app.use(express.urlencoded({ extended: true }))
+        // 配置中间件
+        appConfig.configureMiddleware(app)
 
-// 健康检查路由
-app.get('/api/health', (req, res) => {
-    res.status(200).json({
-        status: 'OK',
-        message: 'AI旅行规划师后端服务运行正常',
-        timestamp: new Date().toISOString(),
-        version: '1.0.0'
-    })
-})
+        // 配置路由
+        appConfig.configureRoutes(app)
 
-// 根路由
-app.get('/', (req, res) => {
-    res.json({
-        message: '欢迎使用AI旅行规划师API服务',
-        documentation: '/api/docs',
-        health: '/api/health'
-    })
-})
+        // 设置数据库连接
+        await setupDatabase()
+        logger.info('数据库连接成功')
 
-// 404处理
-app.use('*', (req, res) => {
-    res.status(404).json({
-        error: '路由不存在',
-        path: req.originalUrl
-    })
+        // 设置错误处理
+        appConfig.setupErrorHandling(app)
+
+        // 启动服务器
+        await appConfig.startServer(app)
+
+        logger.info('后端服务启动完成')
+
+    } catch (error) {
+        logger.error('服务启动失败:', error)
+        process.exit(1)
+    }
+}
+
+// 启动应用
+bootstrap()
+
+// 处理未捕获的异常
+process.on('uncaughtException', (error) => {
+    logger.error('未捕获的异常:', error)
+    process.exit(1)
 })
 
-// 错误处理中间件
-app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error('服务器错误:', error)
-    res.status(500).json({
-        error: '内部服务器错误',
-        message: process.env.NODE_ENV === 'development' ? error.message : '发生未知错误'
-    })
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error('未处理的Promise拒绝:', reason)
+    process.exit(1)
 })
 
-// 启动服务器
-app.listen(PORT, () => {
-    console.log(`🚀 服务器运行在端口 ${PORT}`)
-    console.log(`📊 环境: ${process.env.NODE_ENV || 'development'}`)
-    console.log(`🌐 访问地址: http://localhost:${PORT}`)
-})
-
-export default app
+export default bootstrap
