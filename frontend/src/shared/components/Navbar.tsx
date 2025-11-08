@@ -45,6 +45,12 @@ const Navbar: React.FC = () => {
                         我的行程
                     </Link>
                     <Link
+                        to="/budgets"
+                        className={`navbar-link ${isActive('/budgets') ? 'active' : ''}`}
+                    >
+                        预算管理
+                    </Link>
+                    <Link
                         to="/profile"
                         className={`navbar-link ${isActive('/profile') ? 'active' : ''}`}
                     >

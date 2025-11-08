@@ -48,6 +48,7 @@ const DashboardPage: React.FC = () => {
                         gap: '1rem'
                     }}>
                         <Link to="/trips" className="btn btn-primary">新建行程</Link>
+                        <Link to="/budgets" className="btn btn-secondary">管理预算</Link>
                         <button className="btn btn-secondary">浏览目的地</button>
                         <button className="btn btn-secondary">查看推荐</button>
                     </div>
