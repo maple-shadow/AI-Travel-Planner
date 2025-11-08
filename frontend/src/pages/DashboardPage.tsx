@@ -1,6 +1,7 @@
 // 仪表板页面
 import React from 'react';
 import { useAppSelector } from '../shared/hooks';
+import { Link } from 'react-router-dom';
 
 const DashboardPage: React.FC = () => {
     const user = useAppSelector((state) => state.auth.user);
@@ -46,7 +47,7 @@ const DashboardPage: React.FC = () => {
                         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
                         gap: '1rem'
                     }}>
-                        <button className="btn btn-primary">新建行程</button>
+                        <Link to="/trips" className="btn btn-primary">新建行程</Link>
                         <button className="btn btn-secondary">浏览目的地</button>
                         <button className="btn btn-secondary">查看推荐</button>
                     </div>

@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './authSlice';
 import userReducer from './userSlice';
 import uiReducer from './uiSlice';
+import tripReducer from '../../features/trip-planning/store/tripSlice';
 
 // 配置store
 export const configureAppStore = () => {
@@ -11,6 +12,7 @@ export const configureAppStore = () => {
             auth: authReducer,
             user: userReducer,
             ui: uiReducer,
+            trips: tripReducer,
         },
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({

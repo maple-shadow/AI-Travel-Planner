@@ -5,6 +5,7 @@ import { allRoutes } from './routes';
 import RouteGuard from './RouteGuard';
 import { useAppDispatch, useAppSelector } from '../../shared/hooks';
 import { validateToken } from '../store/authSlice';
+import Layout from '../../shared/components/Layout';
 
 // 加载组件
 const LoadingFallback: React.FC = () => (
@@ -42,7 +43,13 @@ const RouterConfig: React.FC = () => {
                             path={route.path}
                             element={
                                 <RouteGuard route={route}>
-                                    <route.component />
+                                    {route.isPrivate ? (
+                                        <Layout>
+                                            <route.component />
+                                        </Layout>
+                                    ) : (
+                                        <route.component />
+                                    )}
                                 </RouteGuard>
                             }
                         />
