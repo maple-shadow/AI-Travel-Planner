@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals'
 import { TripModel } from '../models/trip.model'
 import { TripValidators } from '../validators/trip.validators'
-import { TripTypes } from '../types/trip.types'
+import { TripStatus, TripType, TripPriority } from '../types/trip.types'
 
 // Mock数据库连接
 jest.mock('../../../../core/database', () => ({
@@ -17,9 +17,9 @@ jest.mock('../../../../core/database', () => ({
                             destination: '测试目的地',
                             start_date: new Date('2024-01-01'),
                             end_date: new Date('2024-01-03'),
-                            status: TripTypes.TripStatus.PLANNING,
-                            type: TripTypes.TripType.LEISURE,
-                            priority: TripTypes.TripPriority.MEDIUM,
+                            status: TripStatus.PLANNING,
+                            type: TripType.LEISURE,
+                            priority: TripPriority.MEDIUM,
                             created_at: new Date(),
                             updated_at: new Date()
                         },
@@ -37,9 +37,9 @@ jest.mock('../../../../core/database', () => ({
                             destination: '测试目的地',
                             start_date: new Date('2024-01-01'),
                             end_date: new Date('2024-01-03'),
-                            status: TripTypes.TripStatus.PLANNING,
-                            type: TripTypes.TripType.LEISURE,
-                            priority: TripTypes.TripPriority.MEDIUM,
+                            status: TripStatus.PLANNING,
+                            type: TripType.LEISURE,
+                            priority: TripPriority.MEDIUM,
                             created_at: new Date(),
                             updated_at: new Date()
                         },
@@ -58,9 +58,9 @@ jest.mock('../../../../core/database', () => ({
                                 destination: '测试目的地',
                                 start_date: new Date('2024-01-01'),
                                 end_date: new Date('2024-01-03'),
-                                status: TripTypes.TripStatus.PLANNING,
-                                type: TripTypes.TripType.LEISURE,
-                                priority: TripTypes.TripPriority.MEDIUM,
+                                status: TripStatus.PLANNING,
+                                type: TripType.LEISURE,
+                                priority: TripPriority.MEDIUM,
                                 created_at: new Date(),
                                 updated_at: new Date()
                             },
@@ -88,9 +88,9 @@ describe('行程数据模型模块', () => {
                     destination: '测试目的地',
                     start_date: new Date('2024-01-01'),
                     end_date: new Date('2024-01-03'),
-                    status: TripTypes.TripStatus.PLANNING,
-                    type: TripTypes.TripType.LEISURE,
-                    priority: TripTypes.TripPriority.MEDIUM
+                    status: TripStatus.PLANNING,
+                    type: TripType.LEISURE,
+                    priority: TripPriority.MEDIUM
                 }
 
                 const result = await TripModel.createTrip(tripData)
@@ -208,9 +208,9 @@ describe('行程数据模型模块', () => {
                                             destination: '目的地1',
                                             start_date: new Date('2024-01-01'),
                                             end_date: new Date('2024-01-03'),
-                                            status: TripTypes.TripStatus.PLANNING,
-                                            type: TripTypes.TripType.LEISURE,
-                                            priority: TripTypes.TripPriority.MEDIUM,
+                                            status: TripStatus.PLANNING,
+                                            type: TripType.LEISURE,
+                                            priority: TripPriority.MEDIUM,
                                             created_at: new Date(),
                                             updated_at: new Date()
                                         },
@@ -424,28 +424,28 @@ describe('行程数据模型模块', () => {
 
     describe('TripTypes', () => {
         it('应该包含正确的状态枚举', () => {
-            expect(TripTypes.TripStatus.PLANNING).toBe('planning')
-            expect(TripTypes.TripStatus.CONFIRMED).toBe('confirmed')
-            expect(TripTypes.TripStatus.IN_PROGRESS).toBe('in_progress')
-            expect(TripTypes.TripStatus.COMPLETED).toBe('completed')
-            expect(TripTypes.TripStatus.CANCELLED).toBe('cancelled')
-            expect(TripTypes.TripStatus.POSTPONED).toBe('postponed')
+            expect(TripStatus.PLANNING).toBe('planning')
+            expect(TripStatus.CONFIRMED).toBe('confirmed')
+            expect(TripStatus.IN_PROGRESS).toBe('in_progress')
+            expect(TripStatus.COMPLETED).toBe('completed')
+            expect(TripStatus.CANCELLED).toBe('cancelled')
+            expect(TripStatus.POSTPONED).toBe('postponed')
         })
 
         it('应该包含正确的类型枚举', () => {
-            expect(TripTypes.TripType.BUSINESS).toBe('business')
-            expect(TripTypes.TripType.LEISURE).toBe('leisure')
-            expect(TripTypes.TripType.FAMILY).toBe('family')
-            expect(TripTypes.TripType.ADVENTURE).toBe('adventure')
-            expect(TripTypes.TripType.EDUCATIONAL).toBe('educational')
-            expect(TripTypes.TripType.OTHER).toBe('other')
+            expect(TripType.BUSINESS).toBe('business')
+            expect(TripType.LEISURE).toBe('leisure')
+            expect(TripType.FAMILY).toBe('family')
+            expect(TripType.ADVENTURE).toBe('adventure')
+            expect(TripType.EDUCATIONAL).toBe('educational')
+            expect(TripType.OTHER).toBe('other')
         })
 
         it('应该包含正确的优先级枚举', () => {
-            expect(TripTypes.TripPriority.LOW).toBe('low')
-            expect(TripTypes.TripPriority.MEDIUM).toBe('medium')
-            expect(TripTypes.TripPriority.HIGH).toBe('high')
-            expect(TripTypes.TripPriority.URGENT).toBe('urgent')
+            expect(TripPriority.LOW).toBe('low')
+            expect(TripPriority.MEDIUM).toBe('medium')
+            expect(TripPriority.HIGH).toBe('high')
+            expect(TripPriority.URGENT).toBe('urgent')
         })
     })
 })

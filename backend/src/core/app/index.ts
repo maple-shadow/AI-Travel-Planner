@@ -8,6 +8,7 @@ import { authMiddleware, validationMiddleware, errorMiddleware, requestLogger, c
 import { createLogger } from '../utils/index'
 import { authRoutes } from '../../modules/auth/routes/auth.routes'
 import tripRoutes from '../../modules/trips/routes/trip.routes'
+import budgetRoutes from '../../modules/budgets/routes/budget.routes'
 
 // 创建日志记录器
 const logger = createLogger('App')
@@ -82,6 +83,9 @@ export const configureRoutes = (app: Application): void => {
 
     // 挂载行程模块路由（需要认证）
     app.use('/api/trips', authMiddleware, tripRoutes)
+
+    // 挂载预算模块路由（需要认证）
+    app.use('/api/budgets', authMiddleware, budgetRoutes)
 
     // 404处理
     app.use('*', (req: Request, res: Response) => {
