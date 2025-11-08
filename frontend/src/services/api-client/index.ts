@@ -48,6 +48,16 @@ const createApiClient = (): AxiosInstance => {
                 window.location.href = '/login';
             }
 
+            // 处理速率限制错误（429）
+            if (error.response?.status === 429) {
+                console.warn('API请求频率过高，请稍后重试');
+                // 显示用户友好的错误信息
+                if (typeof window !== 'undefined') {
+                    // 可以在这里添加UI通知
+                    console.warn('请求过于频繁，请等待一段时间后再试');
+                }
+            }
+
             return Promise.reject(error);
         }
     );

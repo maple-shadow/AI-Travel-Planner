@@ -13,6 +13,13 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ route, children }) => {
     const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
     const location = useLocation();
 
+    // 设置页面标题 - 必须在条件渲染之前调用
+    React.useEffect(() => {
+        if (route.title) {
+            document.title = route.title;
+        }
+    }, [route.title]);
+
     // 如果正在加载认证状态，显示加载指示器
     if (loading) {
         return (
@@ -32,13 +39,6 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ route, children }) => {
         // 如果已认证但访问公开路由，重定向到首页
         return <Navigate to="/dashboard" replace />;
     }
-
-    // 设置页面标题
-    React.useEffect(() => {
-        if (route.title) {
-            document.title = route.title;
-        }
-    }, [route.title]);
 
     return <>{children}</>;
 };

@@ -3,9 +3,10 @@ import cors from 'cors'
 import helmet from 'helmet'
 import compression from 'compression'
 import rateLimit from 'express-rate-limit'
-import { environment } from '../config/index.js'
-import { authMiddleware, validationMiddleware, errorMiddleware, requestLogger, corsMiddleware } from '../middleware/index.js'
-import { createLogger } from '../utils/index.js'
+import { environment } from '../config/index'
+import { authMiddleware, validationMiddleware, errorMiddleware, requestLogger, corsMiddleware } from '../middleware/index'
+import { createLogger } from '../utils/index'
+import { authRoutes } from '../../modules/auth/routes/auth.routes'
 
 // 创建日志记录器
 const logger = createLogger('App')
@@ -74,6 +75,9 @@ export const configureRoutes = (app: Application): void => {
             health: '/api/health'
         })
     })
+
+    // 挂载认证模块路由
+    app.use('/api/auth', authRoutes.getRouter())
 
     // 404处理
     app.use('*', (req: Request, res: Response) => {

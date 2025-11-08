@@ -1,24 +1,14 @@
-import mongoose from 'mongoose'
-import { databaseConfig } from '../config/index.js'
+import { SupabaseConnection, setupSupabase } from './supabase'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 // 数据库连接状态
 let isConnected = false
-let databaseConnection: mongoose.Connection | null = null
-
-// 数据库连接配置
-export const migrationConfig = {
-    autoIndex: process.env.NODE_ENV === 'development',
-    bufferCommands: false,
-    maxPoolSize: databaseConfig.maxConnections,
-    serverSelectionTimeoutMS: databaseConfig.connectionTimeout,
-    socketTimeoutMS: 45000,
-    family: 4
-}
+let databaseConnection: SupabaseClient | null = null
 
 // 数据库连接类
 export class DatabaseConnection {
     private static instance: DatabaseConnection
-    private connection: mongoose.Connection | null = null
+    private connection: SupabaseClient | null = null
 
     private constructor() { }
 
@@ -30,39 +20,22 @@ export class DatabaseConnection {
     }
 
     // 连接数据库
-    public async connect(): Promise<mongoose.Connection> {
+    public async connect(): Promise<SupabaseClient> {
         if (this.connection) {
             return this.connection
         }
 
         try {
-            await mongoose.connect(databaseConfig.mongodbUri, migrationConfig)
-
-            this.connection = mongoose.connection
+            const supabase = SupabaseConnection.getInstance()
+            this.connection = await supabase.connect()
             isConnected = true
             databaseConnection = this.connection
 
-            console.log('✅ 数据库连接成功')
-
-            // 监听连接事件
-            this.connection.on('error', (error) => {
-                console.error('❌ 数据库连接错误:', error)
-                isConnected = false
-            })
-
-            this.connection.on('disconnected', () => {
-                console.log('⚠️ 数据库连接断开')
-                isConnected = false
-            })
-
-            this.connection.on('reconnected', () => {
-                console.log('✅ 数据库重新连接成功')
-                isConnected = true
-            })
+            console.log('✅ Supabase数据库连接成功')
 
             return this.connection
         } catch (error) {
-            console.error('❌ 数据库连接失败:', error)
+            console.error('❌ Supabase数据库连接失败:', error)
             throw error
         }
     }
@@ -70,20 +43,21 @@ export class DatabaseConnection {
     // 断开数据库连接
     public async disconnect(): Promise<void> {
         if (this.connection) {
-            await mongoose.disconnect()
+            const supabase = SupabaseConnection.getInstance()
+            await supabase.disconnect()
             this.connection = null
             isConnected = false
-            console.log('🔌 数据库连接已断开')
+            console.log('🔌 Supabase数据库连接已断开')
         }
     }
 
     // 检查连接状态
     public isConnected(): boolean {
-        return isConnected && this.connection?.readyState === 1
+        return isConnected && this.connection !== null
     }
 
     // 获取连接实例
-    public getConnection(): mongoose.Connection | null {
+    public getConnection(): SupabaseClient | null {
         return this.connection
     }
 }
@@ -95,30 +69,8 @@ export const healthCheck = async (): Promise<{
     details?: any
 }> => {
     try {
-        const db = DatabaseConnection.getInstance()
-
-        if (!db.isConnected()) {
-            return {
-                status: 'unhealthy',
-                message: '数据库连接异常'
-            }
-        }
-
-        // 执行简单的查询测试
-        const adminDb = db.getConnection()?.db.admin()
-        if (adminDb) {
-            await adminDb.ping()
-        }
-
-        return {
-            status: 'healthy',
-            message: '数据库连接正常',
-            details: {
-                readyState: db.getConnection()?.readyState,
-                host: db.getConnection()?.host,
-                name: db.getConnection()?.name
-            }
-        }
+        const supabase = SupabaseConnection.getInstance()
+        return await supabase.healthCheck()
     } catch (error) {
         return {
             status: 'unhealthy',
@@ -141,7 +93,7 @@ export const databaseModels = {
 }
 
 // 初始化数据库连接
-export const setupDatabase = async (): Promise<mongoose.Connection> => {
+export const setupDatabase = async (): Promise<SupabaseClient> => {
     const db = DatabaseConnection.getInstance()
     return await db.connect()
 }

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
-import { authConfig } from '../config/index.js'
+import { authConfig } from '../config/index'
 
 // 扩展Request接口以包含user属性
 declare global {

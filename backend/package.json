@@ -3,9 +3,8 @@
     "version": "1.0.0",
     "description": "AI旅行规划师后端API服务",
     "main": "dist/index.js",
-    "type": "module",
     "scripts": {
-        "dev": "nodemon src/index.ts",
+        "dev": "nodemon --exec ts-node src/index.ts",
         "build": "tsc",
         "start": "node dist/index.js",
         "lint": "eslint src/**/*.ts",
@@ -13,6 +12,7 @@
         "test": "jest"
     },
     "dependencies": {
+        "@supabase/supabase-js": "^2.38.0",
         "@types/joi": "^17.2.2",
         "@types/multer": "^2.0.0",
         "bcryptjs": "^2.4.3",

@@ -1,8 +1,8 @@
 import dotenv from 'dotenv'
-import { environment } from './core/config/index.js'
-import appConfig from './core/app/index.js'
-import { setupDatabase } from './core/database/index.js'
-import { createLogger } from './core/utils/index.js'
+import { environment } from './core/config/index'
+import appConfig from './core/app/index'
+import { setupDatabase } from './core/database/index'
+import { createLogger } from './core/utils/index'
 
 // 创建日志记录器
 const logger = createLogger('Server')
@@ -27,9 +27,13 @@ async function bootstrap() {
         // 配置路由
         appConfig.configureRoutes(app)
 
-        // 设置数据库连接
-        await setupDatabase()
-        logger.info('数据库连接成功')
+        // 设置数据库连接（延迟连接，允许应用在没有数据库的情况下启动）
+        try {
+            await setupDatabase()
+            logger.info('数据库连接成功')
+        } catch (error) {
+            logger.warn('数据库连接失败，应用将继续运行但部分功能可能受限:', error)
+        }
 
         // 设置错误处理
         appConfig.setupErrorHandling(app)

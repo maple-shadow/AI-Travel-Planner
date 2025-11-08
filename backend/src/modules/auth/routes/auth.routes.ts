@@ -50,6 +50,13 @@ export class AuthRoutes {
             this.authController.verifyToken
         );
 
+        // Token验证（兼容前端validate端点）
+        this.router.get(
+            '/validate',
+            this.authValidators.validateToken(),
+            this.authController.verifyToken
+        );
+
         // 刷新Token
         this.router.post(
             '/refresh',
