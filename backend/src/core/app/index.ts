@@ -7,6 +7,7 @@ import { environment } from '../config/index'
 import { authMiddleware, validationMiddleware, errorMiddleware, requestLogger, corsMiddleware } from '../middleware/index'
 import { createLogger } from '../utils/index'
 import { authRoutes } from '../../modules/auth/routes/auth.routes'
+import tripRoutes from '../../modules/trips/routes/trip.routes'
 
 // 创建日志记录器
 const logger = createLogger('App')
@@ -78,6 +79,9 @@ export const configureRoutes = (app: Application): void => {
 
     // 挂载认证模块路由
     app.use('/api/auth', authRoutes.getRouter())
+
+    // 挂载行程模块路由（需要认证）
+    app.use('/api/trips', authMiddleware, tripRoutes)
 
     // 404处理
     app.use('*', (req: Request, res: Response) => {
