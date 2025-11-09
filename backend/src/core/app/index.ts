@@ -9,6 +9,7 @@ import { createLogger } from '../utils/index'
 import { authRoutes } from '../../modules/auth/routes/auth.routes'
 import tripRoutes from '../../modules/trips/routes/trip.routes'
 import budgetRoutes from '../../modules/budgets/routes/budget.routes'
+import { AIRoutes } from '../../modules/ai-services/routes/ai.routes'
 
 // 创建日志记录器
 const logger = createLogger('App')
@@ -86,6 +87,13 @@ export const configureRoutes = (app: Application): void => {
 
     // 挂载预算模块路由（需要认证）
     app.use('/api/budgets', authMiddleware, budgetRoutes)
+
+    // 挂载AI服务模块路由（需要认证）
+    const aiRoutes = new AIRoutes({
+        aliyun: environment.thirdParty.aliyunBailian,
+        iflytek: environment.thirdParty.iflytek
+    });
+    app.use('/api/ai', authMiddleware, aiRoutes.getRoutes())
 
     // 404处理
     app.use('*', (req: Request, res: Response) => {
