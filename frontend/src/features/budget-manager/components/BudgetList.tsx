@@ -97,7 +97,7 @@ const BudgetList: React.FC<BudgetListProps> = ({
                                 <div className="flex-1">
                                     <h3 className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-blue-600"
                                         onClick={() => onSelectBudget(budget)}>
-                                        {budget.name}
+                                        {budget.title}
                                     </h3>
                                     <p className="text-sm text-gray-600 mt-1">{budget.description}</p>
                                 </div>

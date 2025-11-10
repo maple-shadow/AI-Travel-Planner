@@ -84,7 +84,7 @@ const BudgetStats: React.FC<BudgetStatsProps> = ({
                         </div>
                         <div className="ml-4">
                             <p className="text-sm font-medium text-gray-600">总预算金额</p>
-                            <p className="text-2xl font-semibold text-gray-900">¥{budgetStats.total_budget_amount?.toLocaleString()}</p>
+                            <p className="text-2xl font-semibold text-gray-900">¥{budgetStats.total_amount?.toLocaleString()}</p>
                         </div>
                     </div>
                 </div>
@@ -164,51 +164,7 @@ const BudgetStats: React.FC<BudgetStatsProps> = ({
                 </div>
             )}
 
-            {/* 预算使用率 */}
-            {budgetStats.average_usage_rate !== undefined && (
-                <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">预算使用情况</h3>
-                    <div className="space-y-4">
-                        {/* 平均使用率 */}
-                        <div>
-                            <div className="flex justify-between text-sm text-gray-600 mb-1">
-                                <span>平均使用率</span>
-                                <span>{budgetStats.average_usage_rate?.toFixed(1)}%</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-3">
-                                <div
-                                    className={`h-3 rounded-full ${budgetStats.average_usage_rate >= 100 ? 'bg-red-500' :
-                                            budgetStats.average_usage_rate >= 80 ? 'bg-orange-500' :
-                                                budgetStats.average_usage_rate >= 60 ? 'bg-yellow-500' : 'bg-green-500'
-                                        } transition-all duration-300`}
-                                    style={{ width: `${Math.min(budgetStats.average_usage_rate, 100)}%` }}
-                                ></div>
-                            </div>
-                        </div>
 
-                        {/* 超预算数量 */}
-                        {budgetStats.over_budget_count !== undefined && (
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600">超预算数量</span>
-                                <span className={`text-sm font-medium ${budgetStats.over_budget_count > 0 ? 'text-red-600' : 'text-green-600'
-                                    }`}>
-                                    {budgetStats.over_budget_count}
-                                </span>
-                            </div>
-                        )}
-
-                        {/* 完成预算数量 */}
-                        {budgetStats.completed_budget_count !== undefined && (
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600">完成预算数量</span>
-                                <span className="text-sm font-medium text-green-600">
-                                    {budgetStats.completed_budget_count}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
         </div>
     )
 }

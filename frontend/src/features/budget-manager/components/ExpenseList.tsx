@@ -52,7 +52,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
     }
 
     // 获取金额显示样式
-    const getAmountStyle = (type: ExpenseType, amount: number) => {
+    const getAmountStyle = (type: ExpenseType) => {
         const baseStyle = "text-lg font-semibold"
         if (type === ExpenseType.INCOME) {
             return `${baseStyle} text-green-600`
@@ -92,21 +92,21 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
                                         {getTypeIcon(expense.type)}
                                         <span className="ml-1">{expense.type === ExpenseType.INCOME ? '收入' : '支出'}</span>
                                     </span>
-                                    {showBudgetName && expense.budget_name && (
+                                    {showBudgetName && expense.budget_id && (
                                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                            {expense.budget_name}
+                                            预算ID: {expense.budget_id}
                                         </span>
                                     )}
                                 </div>
 
-                                <h4 className="text-base font-medium text-gray-900">{expense.description}</h4>
+                                <h4 className="text-base font-medium text-gray-900">{expense.title}</h4>
 
                                 {expense.category && (
                                     <p className="text-sm text-gray-600 mt-1">分类: {expense.category}</p>
                                 )}
 
-                                {expense.note && (
-                                    <p className="text-sm text-gray-500 mt-1">{expense.note}</p>
+                                {expense.description && (
+                                    <p className="text-sm text-gray-500 mt-1">{expense.description}</p>
                                 )}
                             </div>
 
@@ -133,12 +133,12 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
                         </div>
 
                         <div className="flex justify-between items-center">
-                            <div className={getAmountStyle(expense.type, expense.amount)}>
+                            <div className={getAmountStyle(expense.type)}>
                                 {getAmountPrefix(expense.type)}¥{expense.amount.toLocaleString()}
                             </div>
 
                             <div className="text-sm text-gray-500">
-                                {expense.expense_date && new Date(expense.expense_date).toLocaleDateString()}
+                                {expense.date && new Date(expense.date).toLocaleDateString()}
                             </div>
                         </div>
                     </div>

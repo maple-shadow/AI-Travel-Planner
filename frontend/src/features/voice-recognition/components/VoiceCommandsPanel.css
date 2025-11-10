@@ -1,0 +1,415 @@
+/* 语音命令面板样式 */
+.voice-commands-panel {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 面板头部 */
+.panel-header {
+    padding: 20px;
+    background: white;
+    border-radius: 12px 12px 0 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.panel-title {
+    margin: 0 0 15px 0;
+    color: #495057;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.panel-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* 搜索框 */
+.search-box {
+    position: relative;
+    flex: 1;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+/* 按钮样式 */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-add {
+    background: #28a745;
+    color: white;
+}
+
+.btn-add:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #0056b3;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.btn-execute {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-execute:hover:not(:disabled) {
+    background: #138496;
+}
+
+.btn-toggle {
+    background: #ffc107;
+    color: #212529;
+}
+
+.btn-toggle:hover {
+    background: #e0a800;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-link {
+    background: transparent;
+    color: #007bff;
+    text-decoration: underline;
+}
+
+.btn-link:hover {
+    color: #0056b3;
+}
+
+/* 添加命令表单 */
+.add-command-form {
+    padding: 20px;
+    background: white;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.add-command-form h4 {
+    margin: 0 0 15px 0;
+    color: #495057;
+    font-size: 16px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #495057;
+    font-weight: 500;
+}
+
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-group input[type="text"]:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-group input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* 命令列表 */
+.commands-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.command-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: white;
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s ease;
+}
+
+.command-item:hover {
+    background: #f8f9fa;
+}
+
+.command-item.disabled {
+    opacity: 0.6;
+}
+
+.command-info {
+    flex: 1;
+}
+
+.command-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.command-type {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.command-type.start {
+    background: #d4edda;
+    color: #155724;
+}
+
+.command-type.stop {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.command-type.search {
+    background: #cce7ff;
+    color: #004085;
+}
+
+.command-type.view {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.command-type.add {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.command-type.delete {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.command-type.default {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.command-text {
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+}
+
+.command-description {
+    color: #6c757d;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.command-status {
+    font-size: 11px;
+}
+
+.status-enabled {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.status-disabled {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.command-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* 空状态 */
+.empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    color: #6c757d;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.empty-state p {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+}
+
+/* 面板底部 */
+.panel-footer {
+    padding: 15px 20px;
+    background: white;
+    border-radius: 0 0 12px 12px;
+    border-top: 1px solid #e9ecef;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .voice-commands-panel {
+        margin: 10px;
+    }
+
+    .panel-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .command-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .command-actions {
+        justify-content: flex-end;
+    }
+
+    .stats {
+        flex-direction: column;
+        gap: 5px;
+        text-align: center;
+    }
+}
+
+/* 暗色主题支持 */
+@media (prefers-color-scheme: dark) {
+    .voice-commands-panel {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+
+    .panel-header,
+    .add-command-form,
+    .command-item,
+    .panel-footer {
+        background: #4a5568;
+        color: #e2e8f0;
+    }
+
+    .panel-title,
+    .add-command-form h4,
+    .command-text {
+        color: #e2e8f0;
+    }
+
+    .search-input,
+    .form-group input[type="text"] {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+
+    .search-input:focus,
+    .form-group input[type="text"]:focus {
+        border-color: #63b3ed;
+        box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.25);
+    }
+
+    .command-description,
+    .stats {
+        color: #a0aec0;
+    }
+
+    .command-item:hover {
+        background: #4a5568;
+    }
+
+    .empty-state {
+        color: #a0aec0;
+    }
+}

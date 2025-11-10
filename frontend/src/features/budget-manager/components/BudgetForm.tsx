@@ -1,10 +1,10 @@
 // 预算表单组件
 import React, { useState, useEffect } from 'react'
-import { BudgetData, CreateBudgetData, UpdateBudgetData, BudgetStatus, BudgetCategory } from '../types'
+import { BudgetData, CreateBudgetData, UpdateBudgetData, BudgetCategory } from '../types'
 
 interface BudgetFormProps {
     budget?: BudgetData | null
-    onSubmit: (data: CreateBudgetData | UpdateBudgetData) => void
+    onSubmit: (data: CreateBudgetData | UpdateBudgetData) => void | Promise<void>
     onCancel: () => void
     loading?: boolean
 }
@@ -16,12 +16,11 @@ const BudgetForm: React.FC<BudgetFormProps> = ({
     loading = false
 }) => {
     const [formData, setFormData] = useState<CreateBudgetData>({
-        name: '',
+        title: '',
         description: '',
         total_amount: 0,
         currency: 'CNY',
         category: BudgetCategory.TRAVEL,
-        status: BudgetStatus.ACTIVE,
         start_date: new Date().toISOString().split('T')[0],
         end_date: '',
         user_id: ''
@@ -33,12 +32,11 @@ const BudgetForm: React.FC<BudgetFormProps> = ({
     useEffect(() => {
         if (budget) {
             setFormData({
-                name: budget.name || '',
+                title: budget.title || '',
                 description: budget.description || '',
                 total_amount: budget.total_amount || 0,
                 currency: budget.currency || 'CNY',
                 category: budget.category || BudgetCategory.TRAVEL,
-                status: budget.status || BudgetStatus.ACTIVE,
                 start_date: budget.start_date ? new Date(budget.start_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
                 end_date: budget.end_date ? new Date(budget.end_date).toISOString().split('T')[0] : '',
                 user_id: budget.user_id || ''
@@ -50,8 +48,8 @@ const BudgetForm: React.FC<BudgetFormProps> = ({
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {}
 
-        if (!formData.name.trim()) {
-            newErrors.name = '预算名称不能为空'
+        if (!formData.title.trim()) {
+            newErrors.title = '预算名称不能为空'
         }
 
         if (formData.total_amount <= 0) {
@@ -111,21 +109,21 @@ const BudgetForm: React.FC<BudgetFormProps> = ({
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
                 {/* 预算名称 */}
                 <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
                         预算名称 <span className="text-red-500">*</span>
                     </label>
                     <input
                         type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
+                        id="title"
+                        name="title"
+                        value={formData.title}
                         onChange={handleInputChange}
-                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? 'border-red-300' : 'border-gray-300'
+                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.title ? 'border-red-300' : 'border-gray-300'
                             }`}
                         placeholder="请输入预算名称"
                     />
-                    {errors.name && (
-                        <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                    {errors.title && (
+                        <p className="mt-1 text-sm text-red-600">{errors.title}</p>
                     )}
                 </div>
 
@@ -213,25 +211,6 @@ const BudgetForm: React.FC<BudgetFormProps> = ({
                             <option value={BudgetCategory.ENTERTAINMENT}>娱乐</option>
                             <option value={BudgetCategory.SHOPPING}>购物</option>
                             <option value={BudgetCategory.OTHER}>其他</option>
-                        </select>
-                    </div>
-
-                    {/* 预算状态 */}
-                    <div>
-                        <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
-                            预算状态
-                        </label>
-                        <select
-                            id="status"
-                            name="status"
-                            value={formData.status}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value={BudgetStatus.ACTIVE}>活跃</option>
-                            <option value={BudgetStatus.INACTIVE}>未激活</option>
-                            <option value={BudgetStatus.COMPLETED}>已完成</option>
-                            <option value={BudgetStatus.OVER_BUDGET}>超预算</option>
                         </select>
                     </div>
                 </div>

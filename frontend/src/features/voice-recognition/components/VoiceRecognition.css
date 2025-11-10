@@ -1,0 +1,306 @@
+/* 语音识别组件样式 */
+.voice-recognition {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 状态指示器 */
+.voice-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.status-indicator.idle .status-dot {
+  background-color: #6c757d;
+  animation: none;
+}
+
+.status-indicator.listening .status-dot {
+  background-color: #28a745;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.status-text {
+  font-weight: 600;
+  color: #495057;
+}
+
+/* 音频级别指示器 */
+.audio-level-indicator {
+  display: flex;
+  align-items: end;
+  gap: 2px;
+  height: 30px;
+}
+
+.audio-bar {
+  width: 4px;
+  background-color: #e9ecef;
+  border-radius: 2px;
+  transition: all 0.1s ease;
+}
+
+.audio-bar.active {
+  background-color: #28a745;
+}
+
+/* 识别结果 */
+.recognition-result {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.result-text {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #212529;
+  margin-bottom: 10px;
+  min-height: 24px;
+}
+
+.confidence-bar {
+  height: 4px;
+  border-radius: 2px;
+  margin-bottom: 5px;
+  transition: width 0.3s ease;
+}
+
+.confidence-text {
+  font-size: 12px;
+  color: #6c757d;
+  text-align: right;
+}
+
+/* 错误消息 */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.error-icon {
+  font-size: 16px;
+}
+
+/* 命令反馈 */
+.command-feedback {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #d1edff;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feedback-icon {
+  font-size: 16px;
+}
+
+/* 控制按钮 */
+.control-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+  justify-content: center;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-start {
+  background: #28a745;
+  color: white;
+}
+
+.btn-start:hover:not(:disabled) {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.btn-stop {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-stop:hover:not(:disabled) {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+.btn-clear {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-clear:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.btn-icon {
+  font-size: 16px;
+}
+
+/* 使用提示 */
+.usage-tips {
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.usage-tips h4 {
+  margin: 0 0 10px 0;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.usage-tips ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #6c757d;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.usage-tips li {
+  margin-bottom: 5px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .voice-recognition {
+    margin: 10px;
+    padding: 15px;
+  }
+  
+  .voice-status {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  
+  .control-buttons {
+    flex-direction: column;
+  }
+  
+  .btn {
+    min-width: auto;
+  }
+}
+
+/* 暗色主题支持 */
+@media (prefers-color-scheme: dark) {
+  .voice-recognition {
+    background: #2d3748;
+    color: #e2e8f0;
+  }
+  
+  .voice-status,
+  .recognition-result,
+  .usage-tips {
+    background: #4a5568;
+    color: #e2e8f0;
+  }
+  
+  .status-text,
+  .result-text,
+  .usage-tips h4 {
+    color: #e2e8f0;
+  }
+  
+  .confidence-text,
+  .usage-tips li {
+    color: #a0aec0;
+  }
+  
+  .audio-bar {
+    background-color: #4a5568;
+  }
+  
+  .audio-bar.active {
+    background-color: #48bb78;
+  }
+}

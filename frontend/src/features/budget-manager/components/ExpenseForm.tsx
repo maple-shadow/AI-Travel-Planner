@@ -1,11 +1,11 @@
 // 开销表单组件
 import React, { useState, useEffect } from 'react'
-import { ExpenseData, CreateExpenseData, UpdateExpenseData, ExpenseType, BudgetData } from '../types'
+import { ExpenseData, CreateExpenseData, UpdateExpenseData, ExpenseType, BudgetData, BudgetCategory } from '../types'
 
 interface ExpenseFormProps {
     expense?: ExpenseData | null
     budgets: BudgetData[]
-    onSubmit: (data: CreateExpenseData | UpdateExpenseData) => void
+    onSubmit: (data: CreateExpenseData | UpdateExpenseData) => void | Promise<void>
     onCancel: () => void
     loading?: boolean
 }
@@ -18,14 +18,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     loading = false
 }) => {
     const [formData, setFormData] = useState<CreateExpenseData>({
+        title: '',
         description: '',
         amount: 0,
         type: ExpenseType.EXPENSE,
-        category: '',
-        expense_date: new Date().toISOString().split('T')[0],
+        category: BudgetCategory.OTHER,
+        date: new Date().toISOString().split('T')[0],
         budget_id: '',
-        user_id: '',
-        note: ''
+        user_id: ''
     })
 
     const [errors, setErrors] = useState<Record<string, string>>({})
@@ -37,11 +37,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                 description: expense.description || '',
                 amount: expense.amount || 0,
                 type: expense.type || ExpenseType.EXPENSE,
-                category: expense.category || '',
-                expense_date: expense.expense_date ? new Date(expense.expense_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                category: expense.category || BudgetCategory.OTHER,
+                date: expense.date ? new Date(expense.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
                 budget_id: expense.budget_id || '',
                 user_id: expense.user_id || '',
-                note: expense.note || ''
+                title: expense.title || ''
             })
         }
     }, [expense])
@@ -50,7 +50,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {}
 
-        if (!formData.description.trim()) {
+        if (!formData.description?.trim()) {
             newErrors.description = '开销描述不能为空'
         }
 
@@ -190,14 +190,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 
                     {/* 开销日期 */}
                     <div>
-                        <label htmlFor="expense_date" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
                             日期 <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="date"
-                            id="expense_date"
-                            name="expense_date"
-                            value={formData.expense_date}
+                            id="date"
+                            name="date"
+                            value={formData.date}
                             onChange={handleInputChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
@@ -220,7 +220,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                         <option value="">请选择预算</option>
                         {budgets.map(budget => (
                             <option key={budget.id} value={budget.id}>
-                                {budget.name} (¥{budget.total_amount?.toLocaleString()})
+                                {budget.title} (¥{budget.total_amount?.toLocaleString()})
                             </option>
                         ))}
                     </select>
@@ -229,21 +229,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
                     )}
                 </div>
 
-                {/* 备注 */}
-                <div>
-                    <label htmlFor="note" className="block text-sm font-medium text-gray-700 mb-1">
-                        备注
-                    </label>
-                    <textarea
-                        id="note"
-                        name="note"
-                        value={formData.note}
-                        onChange={handleInputChange}
-                        rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="请输入备注信息（可选）"
-                    />
-                </div>
+
 
                 {/* 按钮组 */}
                 <div className="flex justify-end space-x-3 pt-4">

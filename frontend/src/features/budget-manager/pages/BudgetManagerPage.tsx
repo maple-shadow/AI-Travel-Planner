@@ -9,8 +9,6 @@ const BudgetManagerPage: React.FC = () => {
     const [currentView, setCurrentView] = useState<'overview' | 'budget-detail' | 'create-budget' | 'edit-budget' | 'create-expense' | 'edit-expense'>('overview')
     const [selectedBudget, setSelectedBudget] = useState<BudgetData | null>(null)
     const [selectedExpense, setSelectedExpense] = useState<ExpenseData | null>(null)
-    const [showBudgetForm, setShowBudgetForm] = useState(false)
-    const [showExpenseForm, setShowExpenseForm] = useState(false)
 
     // 使用Hooks
     const budgetHook = useBudget()
@@ -42,7 +40,6 @@ const BudgetManagerPage: React.FC = () => {
         })
 
         if (result.success) {
-            setShowBudgetForm(false)
             setCurrentView('overview')
             // 刷新统计信息
             statsHook.refetch()
@@ -56,7 +53,6 @@ const BudgetManagerPage: React.FC = () => {
         const result = await budgetHook.updateBudget(selectedBudget.id, budgetData)
 
         if (result.success) {
-            setShowBudgetForm(false)
             setCurrentView('budget-detail')
             // 刷新统计信息
             statsHook.refetch()
@@ -65,7 +61,7 @@ const BudgetManagerPage: React.FC = () => {
 
     // 处理删除预算
     const handleDeleteBudget = async (budget: BudgetData) => {
-        if (window.confirm(`确定要删除预算"${budget.name}"吗？此操作不可撤销。`)) {
+        if (window.confirm(`确定要删除预算"${budget.title}"吗？此操作不可撤销。`)) {
             const result = await budgetHook.deleteBudget(budget.id)
 
             if (result.success) {
@@ -90,7 +86,6 @@ const BudgetManagerPage: React.FC = () => {
         })
 
         if (result.success) {
-            setShowExpenseForm(false)
             // 刷新预算详情和开销列表
             budgetHook.getBudgetById(selectedBudget.id)
             budgetHook.listBudgetExpenses(selectedBudget.id)
@@ -104,7 +99,6 @@ const BudgetManagerPage: React.FC = () => {
         const result = await budgetHook.updateExpense(selectedExpense.id, expenseData)
 
         if (result.success) {
-            setShowExpenseForm(false)
             setSelectedExpense(null)
             // 刷新开销列表
             if (selectedBudget?.id) {
@@ -136,13 +130,11 @@ const BudgetManagerPage: React.FC = () => {
 
     const handleEditBudget = (budget: BudgetData) => {
         setSelectedBudget(budget)
-        setShowBudgetForm(true)
         setCurrentView('edit-budget')
     }
 
     const handleEditExpense = (expense: ExpenseData) => {
         setSelectedExpense(expense)
-        setShowExpenseForm(true)
         setCurrentView('edit-expense')
     }
 
@@ -153,13 +145,11 @@ const BudgetManagerPage: React.FC = () => {
 
     const handleCreateNewBudget = () => {
         setSelectedBudget(null)
-        setShowBudgetForm(true)
         setCurrentView('create-budget')
     }
 
     const handleCreateNewExpense = () => {
         setSelectedExpense(null)
-        setShowExpenseForm(true)
         setCurrentView('create-expense')
     }
 
@@ -216,7 +206,7 @@ const BudgetManagerPage: React.FC = () => {
                                     </svg>
                                     返回概览
                                 </button>
-                                <h2 className="text-2xl font-bold text-gray-900">{selectedBudget.name}</h2>
+                                <h2 className="text-2xl font-bold text-gray-900">{selectedBudget.title}</h2>
                                 {selectedBudget.description && (
                                     <p className="text-gray-600 mt-1">{selectedBudget.description}</p>
                                 )}
@@ -275,7 +265,6 @@ const BudgetManagerPage: React.FC = () => {
                     <div>
                         <button
                             onClick={() => {
-                                setShowBudgetForm(false)
                                 setCurrentView(currentView === 'create-budget' ? 'overview' : 'budget-detail')
                             }}
                             className="flex items-center text-blue-600 hover:text-blue-800 mb-4"
@@ -287,9 +276,14 @@ const BudgetManagerPage: React.FC = () => {
                         </button>
                         <BudgetForm
                             budget={currentView === 'edit-budget' ? selectedBudget : undefined}
-                            onSubmit={currentView === 'edit-budget' ? handleUpdateBudget : handleCreateBudget}
+                            onSubmit={async (data) => {
+                                if (currentView === 'edit-budget') {
+                                    await handleUpdateBudget(data as UpdateBudgetData)
+                                } else {
+                                    await handleCreateBudget(data as CreateBudgetData)
+                                }
+                            }}
                             onCancel={() => {
-                                setShowBudgetForm(false)
                                 setCurrentView(currentView === 'create-budget' ? 'overview' : 'budget-detail')
                             }}
                             loading={budgetHook.loading}
@@ -303,7 +297,6 @@ const BudgetManagerPage: React.FC = () => {
                     <div>
                         <button
                             onClick={() => {
-                                setShowExpenseForm(false)
                                 setCurrentView('budget-detail')
                             }}
                             className="flex items-center text-blue-600 hover:text-blue-800 mb-4"
@@ -316,9 +309,14 @@ const BudgetManagerPage: React.FC = () => {
                         <ExpenseForm
                             expense={currentView === 'edit-expense' ? selectedExpense : undefined}
                             budgets={budgetHook.budgets}
-                            onSubmit={currentView === 'edit-expense' ? handleUpdateExpense : handleCreateExpense}
+                            onSubmit={async (data) => {
+                                if (currentView === 'edit-expense') {
+                                    await handleUpdateExpense(data as UpdateExpenseData)
+                                } else {
+                                    await handleCreateExpense(data as CreateExpenseData)
+                                }
+                            }}
                             onCancel={() => {
-                                setShowExpenseForm(false)
                                 setCurrentView('budget-detail')
                             }}
                             loading={budgetHook.loading}

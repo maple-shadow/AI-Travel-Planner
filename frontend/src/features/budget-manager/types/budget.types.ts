@@ -3,6 +3,7 @@
 // 预算状态枚举
 export enum BudgetStatus {
     ACTIVE = 'active',
+    INACTIVE = 'inactive',
     COMPLETED = 'completed',
     CANCELLED = 'cancelled',
     OVER_BUDGET = 'over_budget'
@@ -10,9 +11,11 @@ export enum BudgetStatus {
 
 // 预算分类枚举
 export enum BudgetCategory {
+    TRAVEL = 'travel',
     TRANSPORTATION = 'transportation',
     ACCOMMODATION = 'accommodation',
     FOOD = 'food',
+    ENTERTAINMENT = 'entertainment',
     ACTIVITIES = 'activities',
     SHOPPING = 'shopping',
     OTHER = 'other'
@@ -20,10 +23,8 @@ export enum BudgetCategory {
 
 // 开销类型枚举
 export enum ExpenseType {
-    CASH = 'cash',
-    CARD = 'card',
-    DIGITAL = 'digital',
-    OTHER = 'other'
+    INCOME = 'income',
+    EXPENSE = 'expense'
 }
 
 // 预算数据接口
@@ -48,6 +49,7 @@ export interface BudgetData {
 // 创建预算数据接口
 export interface CreateBudgetData {
     trip_id?: string
+    user_id: string
     title: string
     description?: string
     total_amount: number
@@ -89,6 +91,7 @@ export interface ExpenseData {
 // 创建开销数据接口
 export interface CreateExpenseData {
     budget_id: string
+    user_id: string
     title: string
     description?: string
     amount: number
@@ -135,8 +138,12 @@ export interface BudgetStats {
 export interface ExpenseStats {
     total_expenses: number
     total_amount: number
+    total_expense_amount?: number
+    total_income_amount?: number
     average_expense_amount: number
     category_breakdown: Record<string, number>
+    category_stats?: Record<string, number>
+    monthly_stats?: Record<string, number>
     daily_average: number
     monthly_average: number
 }
