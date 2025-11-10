@@ -10,6 +10,7 @@ import { authRoutes } from '../../modules/auth/routes/auth.routes'
 import tripRoutes from '../../modules/trips/routes/trip.routes'
 import budgetRoutes from '../../modules/budgets/routes/budget.routes'
 import { AIRoutes } from '../../modules/ai-services/routes/ai.routes'
+import syncRoutes from '../../modules/data-sync/routes/sync.routes'
 
 // 创建日志记录器
 const logger = createLogger('App')
@@ -94,6 +95,9 @@ export const configureRoutes = (app: Application): void => {
         iflytek: environment.thirdParty.iflytek
     });
     app.use('/api/ai', authMiddleware, aiRoutes.getRoutes())
+
+    // 挂载数据同步模块路由（需要认证）
+    app.use('/api/sync', authMiddleware, syncRoutes)
 
     // 404处理
     app.use('*', (req: Request, res: Response) => {
