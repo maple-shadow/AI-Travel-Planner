@@ -1,0 +1,164 @@
+.route-display {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+}
+
+.route-display.selectable {
+    cursor: pointer;
+}
+
+.route-display.selectable:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
+}
+
+.route-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.route-info {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.route-distance,
+.route-duration {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.route-select-indicator {
+    font-size: 16px;
+    color: #6b7280;
+    transition: color 0.2s;
+}
+
+.route-display.selectable:hover .route-select-indicator {
+    color: #3b82f6;
+}
+
+.route-steps {
+    border-top: 1px solid #f3f4f6;
+    padding-top: 12px;
+}
+
+.steps-header {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.route-step {
+    display: flex;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f9fafb;
+}
+
+.route-step:last-child {
+    border-bottom: none;
+}
+
+.step-number {
+    width: 24px;
+    height: 24px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-instruction {
+    font-size: 13px;
+    color: #374151;
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+.step-distance {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.more-steps {
+    text-align: center;
+    font-size: 12px;
+    color: #6b7280;
+    padding: 8px;
+    background: #f9fafb;
+    border-radius: 4px;
+    margin-top: 8px;
+}
+
+.route-locations {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.location-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.location-marker {
+    font-size: 14px;
+}
+
+.location-text {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .route-display {
+        padding: 12px;
+        margin-bottom: 8px;
+    }
+
+    .route-info {
+        gap: 12px;
+    }
+
+    .route-distance,
+    .route-duration {
+        font-size: 13px;
+    }
+
+    .route-step {
+        padding: 6px 0;
+    }
+
+    .step-instruction {
+        font-size: 12px;
+    }
+}

@@ -1,0 +1,256 @@
+.map-navigation-page {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+}
+
+.map-navigation-page.error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fed7d7;
+}
+
+.error-container {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+}
+
+.error-container h2 {
+    color: #c53030;
+    margin-bottom: 16px;
+}
+
+.error-container p {
+    color: #718096;
+    margin-bottom: 8px;
+}
+
+.map-header {
+    background: white;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.map-header h1 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.header-controls {
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #2563eb;
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #cbd5e0;
+}
+
+.map-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.map-sidebar {
+    width: 350px;
+    background: white;
+    border-right: 1px solid #e2e8f0;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.map-sidebar h3 {
+    margin: 0 0 16px 0;
+    color: #2d3748;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.search-section {
+    flex-shrink: 0;
+}
+
+.mode-section {
+    flex-shrink: 0;
+}
+
+.mode-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.mode-btn.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.mode-btn:hover:not(.active) {
+    background: #f9fafb;
+}
+
+.route-section {
+    flex-shrink: 0;
+}
+
+.route-result {
+    margin-top: 16px;
+}
+
+.info-section {
+    flex-shrink: 0;
+}
+
+.location-info,
+.markers-info {
+    background: #f7fafc;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.location-info strong,
+.markers-info strong {
+    color: #4a5568;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.location-info div {
+    color: #718096;
+    font-family: monospace;
+}
+
+.markers-info span {
+    color: #718096;
+}
+
+.map-container-wrapper {
+    flex: 1;
+    position: relative;
+    min-height: 400px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .map-sidebar {
+        width: 300px;
+        padding: 16px;
+    }
+
+    .map-header {
+        padding: 12px 16px;
+    }
+
+    .map-header h1 {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .map-content {
+        flex-direction: column;
+    }
+
+    .map-sidebar {
+        width: 100%;
+        height: auto;
+        max-height: 40vh;
+        border-right: none;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .map-container-wrapper {
+        height: 60vh;
+    }
+
+    .header-controls {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .map-sidebar {
+        padding: 12px;
+        gap: 16px;
+    }
+
+    .map-sidebar h3 {
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+
+    .mode-buttons {
+        flex-direction: column;
+    }
+
+    .location-info,
+    .markers-info {
+        padding: 8px;
+        font-size: 13px;
+    }
+}

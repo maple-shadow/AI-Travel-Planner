@@ -51,6 +51,12 @@ const Navbar: React.FC = () => {
                         预算管理
                     </Link>
                     <Link
+                        to="/map"
+                        className={`navbar-link ${isActive('/map') ? 'active' : ''}`}
+                    >
+                        地图导航
+                    </Link>
+                    <Link
                         to="/profile"
                         className={`navbar-link ${isActive('/profile') ? 'active' : ''}`}
                     >
