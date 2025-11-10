@@ -9,7 +9,18 @@
         "start": "node dist/index.js",
         "lint": "eslint src/**/*.ts",
         "lint:fix": "eslint src/**/*.ts --fix",
-        "test": "jest"
+        "test": "jest",
+        "test:unit": "ts-node src/__tests__/test-scripts.ts unit",
+        "test:integration": "ts-node src/__tests__/test-scripts.ts integration",
+        "test:coverage": "ts-node src/__tests__/test-scripts.ts coverage",
+        "test:full": "ts-node src/__tests__/test-scripts.ts full",
+        "test:module": "ts-node src/__tests__/test-scripts.ts module",
+        "test:jest": "ts-node src/__tests__/test-scripts.ts jest",
+        "test:watch": "ts-node src/__tests__/test-scripts.ts watch",
+        "test:file": "ts-node src/__tests__/test-scripts.ts file",
+        "test:junit": "ts-node src/__tests__/test-scripts.ts junit",
+        "test:clear-cache": "ts-node src/__tests__/test-scripts.ts clear-cache",
+        "test:help": "ts-node src/__tests__/test-scripts.ts help"
     },
     "dependencies": {
         "@supabase/supabase-js": "^2.38.0",

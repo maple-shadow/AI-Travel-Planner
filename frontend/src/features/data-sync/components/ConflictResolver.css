@@ -1,0 +1,265 @@
+.conflict-resolver {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.conflict-resolver__header {
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #fffbf0;
+}
+
+.conflict-resolver__title {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #856404;
+}
+
+.conflict-resolver__description {
+    margin: 0;
+    font-size: 14px;
+    color: #856404;
+    line-height: 1.4;
+}
+
+.conflict-resolver__content {
+    padding: 20px;
+}
+
+.conflict-resolver__changes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.conflict-resolver__change {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 16px;
+    background: #f8f9fa;
+}
+
+.conflict-resolver__change--local {
+    border-left: 4px solid #007bff;
+}
+
+.conflict-resolver__change--remote {
+    border-left: 4px solid #28a745;
+}
+
+.conflict-resolver__change-title {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.conflict-resolver__change-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 12px;
+}
+
+.conflict-resolver__change-type {
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: #e9ecef;
+    color: #495057;
+    font-weight: 600;
+}
+
+.conflict-resolver__change-time {
+    color: #6c757d;
+}
+
+.conflict-resolver__change-data {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.conflict-resolver__change-data pre {
+    margin: 0;
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.conflict-resolver__resolution {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 16px;
+    background: #f8f9fa;
+}
+
+.conflict-resolver__resolution-title {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.conflict-resolver__options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.conflict-resolver__option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.conflict-resolver__option:hover {
+    border-color: #007bff;
+    background: #f8fbff;
+}
+
+.conflict-resolver__option input[type="radio"] {
+    margin-top: 2px;
+}
+
+.conflict-resolver__option-label {
+    flex: 1;
+}
+
+.conflict-resolver__option-label strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+.conflict-resolver__option-description {
+    display: block;
+    font-size: 12px;
+    color: #6c757d;
+    line-height: 1.4;
+}
+
+.conflict-resolver__preview {
+    margin-top: 16px;
+    padding: 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.conflict-resolver__preview h5 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.conflict-resolver__preview-content {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.conflict-resolver__preview-content pre {
+    margin: 0;
+    font-size: 11px;
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.conflict-resolver__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px;
+    border-top: 1px solid #e0e0e0;
+    background: #f8f9fa;
+}
+
+.conflict-resolver__button {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.conflict-resolver__button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.conflict-resolver__button--cancel {
+    background: #fff;
+    color: #6c757d;
+}
+
+.conflict-resolver__button--cancel:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #6c757d;
+}
+
+.conflict-resolver__button--resolve {
+    background: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+.conflict-resolver__button--resolve:hover:not(:disabled) {
+    background: #0056b3;
+    border-color: #0056b3;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .conflict-resolver__changes {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .conflict-resolver__content {
+        padding: 16px;
+    }
+
+    .conflict-resolver__actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .conflict-resolver__button {
+        width: 100%;
+    }
+}
+
+/* 选中状态的样式 */
+.conflict-resolver__option input[type="radio"]:checked+.conflict-resolver__option-label {
+    color: #007bff;
+}
+
+.conflict-resolver__option input[type="radio"]:checked~.conflict-resolver__option-label strong {
+    color: #007bff;
+}
+
+.conflict-resolver__option:has(input[type="radio"]:checked) {
+    border-color: #007bff;
+    background: #f8fbff;
+}

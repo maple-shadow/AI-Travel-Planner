@@ -1,0 +1,198 @@
+.sync-status {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: all 0.3s ease;
+}
+
+.sync-status:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sync-status--syncing {
+    border-left: 4px solid #007bff;
+    background: #f8fbff;
+}
+
+.sync-status--offline {
+    border-left: 4px solid #6c757d;
+    background: #f8f9fa;
+}
+
+.sync-status--conflict {
+    border-left: 4px solid #ffc107;
+    background: #fffbf0;
+}
+
+.sync-status--pending {
+    border-left: 4px solid #17a2b8;
+    background: #f0fcff;
+}
+
+.sync-status--synced {
+    border-left: 4px solid #28a745;
+    background: #f8fff9;
+}
+
+.sync-status__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.sync-status__icon {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.sync-status__text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    flex: 1;
+}
+
+.sync-status__actions {
+    display: flex;
+    gap: 8px;
+}
+
+.sync-status__button {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sync-status__button:hover:not(:disabled) {
+    background: #f5f5f5;
+}
+
+.sync-status__button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.sync-status__button--sync {
+    border-color: #007bff;
+    color: #007bff;
+}
+
+.sync-status__button--sync:hover:not(:disabled) {
+    background: #007bff;
+    color: #fff;
+}
+
+.sync-status__button--resolve {
+    border-color: #ffc107;
+    color: #856404;
+    background: #fff3cd;
+}
+
+.sync-status__button--resolve:hover:not(:disabled) {
+    background: #ffeaa7;
+}
+
+.sync-status__details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+}
+
+.sync-status__detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.sync-status__label {
+    font-size: 12px;
+    color: #666;
+}
+
+.sync-status__value {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.sync-status__value--online {
+    color: #28a745;
+}
+
+.sync-status__value--offline {
+    color: #6c757d;
+}
+
+.sync-status__error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 8px;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    color: #721c24;
+}
+
+.sync-status__error-icon {
+    font-size: 14px;
+}
+
+.sync-status__error-text {
+    font-size: 12px;
+    flex: 1;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .sync-status {
+        padding: 12px;
+    }
+
+    .sync-status__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .sync-status__actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .sync-status__details {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .sync-status__detail {
+        justify-content: space-between;
+    }
+}
+
+/* 动画效果 */
+@keyframes sync-pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.sync-status--syncing .sync-status__icon {
+    animation: sync-pulse 1.5s infinite;
+}
