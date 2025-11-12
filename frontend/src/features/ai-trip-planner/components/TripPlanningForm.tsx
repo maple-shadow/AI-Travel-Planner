@@ -252,15 +252,33 @@ export const TripPlanningForm: React.FC<TripPlanningFormProps> = ({
                     preferences: []
                 }}
             >
-                {/* 语音输入区域 */}
+                {/* 旅行需求输入区域 - 支持语音和打字输入 */}
                 <Form.Item
                     label={
                         <Space>
                             <AudioOutlined />
-                            <Text strong>语音输入旅行需求</Text>
+                            <Text strong>旅行需求输入</Text>
+                            <Text type="secondary" style={{ fontSize: '12px' }}>
+                                (支持语音输入或直接打字输入)
+                            </Text>
                         </Space>
                     }
                 >
+                    <div style={{ marginBottom: '16px' }}>
+                        <TextArea
+                            rows={3}
+                            placeholder="请直接输入您的旅行需求，例如：我想去日本，5天，预算1万元，喜欢美食和动漫，带孩子"
+                            value={voiceInput}
+                            onChange={(e) => setVoiceInput(e.target.value)}
+                            disabled={loading}
+                            style={{ marginBottom: '12px' }}
+                        />
+                        <div style={{ textAlign: 'center' }}>
+                            <Text type="secondary" style={{ fontSize: '12px' }}>
+                                或使用语音输入
+                            </Text>
+                        </div>
+                    </div>
                     <VoiceInput
                         onTextChange={setVoiceInput}
                         placeholder="例如：我想去日本，5天，预算1万元，喜欢美食和动漫，带孩子"

@@ -28,8 +28,11 @@ const TripListPage: React.FC = () => {
 
     // 确保trips是数组类型，避免filter调用错误
     const filteredTrips = Array.isArray(trips) ? trips.filter(trip => {
-        const matchesSearch = trip.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            trip.destination.toLowerCase().includes(searchTerm.toLowerCase());
+        // 安全处理可能为undefined或null的title和destination字段
+        const tripTitle = trip.title || '';
+        const tripDestination = trip.destination || '';
+        const matchesSearch = tripTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            tripDestination.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = statusFilter === 'all' || trip.status === statusFilter;
         return matchesSearch && matchesStatus;
     }) : [];
