@@ -7,14 +7,17 @@ WORKDIR /app
 # 复制package.json和package-lock.json
 COPY backend/package*.json ./
 
-# 安装依赖
-RUN npm ci --only=production
+# 安装所有依赖（包括开发依赖）
+RUN npm ci
 
 # 复制源代码
 COPY . .
 
 # 构建应用
 RUN npm run build
+
+# 清理开发依赖，只保留生产依赖
+RUN npm prune --production
 
 # 暴露端口
 EXPOSE 3000
