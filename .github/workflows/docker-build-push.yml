@@ -48,7 +48,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ./backend
-        file: ./backend/Dockerfile
+        file: Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ env.REGISTRY }}/ai-travel-planner-backend:${{ github.sha }}
         labels: ${{ steps.meta.outputs.labels }}
@@ -59,7 +59,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ./frontend
-        file: ./frontend/Dockerfile
+        file: Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ env.REGISTRY }}/ai-travel-planner-frontend:${{ github.sha }}
         labels: ${{ steps.meta.outputs.labels }}
@@ -73,7 +73,7 @@ jobs:
         version: '3.8'
         services:
           backend:
-            image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
+            image: ${{ env.REGISTRY }}/ai-travel-planner-backend:${{ github.sha }}
             environment:
               - NODE_ENV=production
             ports:
@@ -81,7 +81,7 @@ jobs:
             restart: unless-stopped
             
           frontend:
-            image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
+            image: ${{ env.REGISTRY }}/ai-travel-planner-frontend:${{ github.sha }}
             ports:
               - "80:80"
             restart: unless-stopped
