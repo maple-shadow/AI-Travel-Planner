@@ -8,7 +8,7 @@ on:
     branches: [ main, master ]
 
 env:
-  REGISTRY: registry.cn-hangzhou.aliyuncs.com
+  REGISTRY: crpi-y34dw9cggtyfgmzy.cn-hangzhou.personal.cr.aliyuncs.com
   BACKEND_IMAGE_NAME: ${{ github.repository }}-backend
   FRONTEND_IMAGE_NAME: ${{ github.repository }}-frontend
 
@@ -35,8 +35,8 @@ jobs:
       uses: docker/metadata-action@v5
       with:
         images: |
-          ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}
-          ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
+          ${{ env.REGISTRY }}/ai-travel-planner-backend
+          ${{ env.REGISTRY }}/ai-travel-planner-frontend
         tags: |
           type=ref,event=branch
           type=ref,event=pr
@@ -50,7 +50,7 @@ jobs:
         context: ./backend
         file: ./backend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ steps.meta.outputs.tags }}
+        tags: ${{ env.REGISTRY }}/ai-travel-planner-backend:${{ github.sha }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -61,7 +61,7 @@ jobs:
         context: ./frontend
         file: ./frontend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ steps.meta.outputs.tags }}
+        tags: ${{ env.REGISTRY }}/ai-travel-planner-frontend:${{ github.sha }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
