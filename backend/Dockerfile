@@ -10,8 +10,9 @@ COPY backend/package*.json ./
 # 安装所有依赖（包括开发依赖）
 RUN npm ci
 
-# 复制源代码
-COPY . .
+# 复制源代码（排除node_modules）
+COPY backend/src ./src
+COPY backend/tsconfig.json ./
 
 # 构建应用
 RUN npm run build
