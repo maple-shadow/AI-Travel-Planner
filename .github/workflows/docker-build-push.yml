@@ -83,6 +83,19 @@ jobs:
           type=semver,pattern={{major}}.{{minor}}
           type=sha,prefix={{branch}}-
 
+    - name: Debug build configuration
+      run: |
+        echo "🔧 调试构建配置:"
+        echo "当前提交: ${{ github.sha }}"
+        echo "工作流文件内容:"
+        cat .github/workflows/docker-build-push.yml | grep -A 10 -B 5 "Build and push backend image"
+        echo ""
+        echo "backend目录内容:"
+        ls -la backend/
+        echo ""
+        echo "Dockerfile路径: backend/Dockerfile"
+        ls -la backend/Dockerfile
+
     - name: Build and push backend image
       uses: docker/build-push-action@v5
       with:
