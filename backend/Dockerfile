@@ -5,7 +5,7 @@ FROM node:18-alpine
 WORKDIR /app
 
 # 复制package.json和package-lock.json
-COPY package*.json ./
+COPY backend/package*.json ./
 
 # 安装依赖
 RUN npm ci --only=production
