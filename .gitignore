@@ -124,7 +124,6 @@ Thumbs.db
 
 # Docker相关文件
 .dockerignore
-Dockerfile*
 *.dockerfile
 docker-compose.override.yml
 
