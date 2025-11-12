@@ -23,12 +23,51 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
+    - name: Display build information
+      run: |
+        echo "🚀 开始构建Docker镜像"
+        echo "仓库: ${{ github.repository }}"
+        echo "分支: ${{ github.ref }}"
+        echo "提交: ${{ github.sha }}"
+        echo "Registry: ${{ env.REGISTRY }}"
+        echo "构建时间: $(date)"
+
+    - name: Check directory structure
+      run: |
+        echo "📁 检查项目目录结构:"
+        echo "当前工作目录: $(pwd)"
+        echo ""
+        echo "📂 根目录内容:"
+        ls -la
+        echo ""
+        echo "📂 backend目录内容:"
+        ls -la backend/ || echo "backend目录不存在"
+        echo ""
+        echo "📂 frontend目录内容:"
+        ls -la frontend/ || echo "frontend目录不存在"
+        echo ""
+        echo "📂 .github/workflows目录内容:"
+        ls -la .github/workflows/ || echo ".github/workflows目录不存在"
+        echo ""
+        echo "🔍 检查Dockerfile是否存在:"
+        echo "backend/Dockerfile: $(ls -la backend/Dockerfile 2>/dev/null && echo '✅ 存在' || echo '❌ 不存在')"
+        echo "frontend/Dockerfile: $(ls -la frontend/Dockerfile 2>/dev/null && echo '✅ 存在' || echo '❌ 不存在')"
+        echo ""
+        echo "📊 目录结构检查完成"
+
     - name: Log in to Alibaba Cloud Container Registry
       uses: docker/login-action@v3
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ secrets.ALIBABA_CLOUD_USERNAME }}
         password: ${{ secrets.ALIBABA_CLOUD_PASSWORD }}
+
+    - name: Verify registry login
+      run: |
+        echo "✅ 已登录到阿里云容器镜像服务"
+        echo "Registry: ${{ env.REGISTRY }}"
+        echo "用户名: ${{ secrets.ALIBABA_CLOUD_USERNAME }}"
+        echo "登录时间: $(date)"
 
     - name: Extract metadata (tags, labels)
       id: meta
@@ -47,24 +86,42 @@ jobs:
     - name: Build and push backend image
       uses: docker/build-push-action@v5
       with:
-        context: ./backend
-        file: Dockerfile
+        context: .
+        file: ./backend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ env.REGISTRY }}/ai-travel-planner-backend:${{ github.sha }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+      env:
+        BUILDKIT_PROGRESS: plain
+
+    - name: Verify backend image
+      if: github.event_name != 'pull_request'
+      run: |
+        echo "✅ 后端镜像构建完成"
+        echo "镜像标签: ${{ env.REGISTRY }}/ai-travel-planner-backend:${{ github.sha }}"
+        echo "构建时间: $(date)"
 
     - name: Build and push frontend image
       uses: docker/build-push-action@v5
       with:
-        context: ./frontend
-        file: Dockerfile
+        context: .
+        file: ./frontend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ env.REGISTRY }}/ai-travel-planner-frontend:${{ github.sha }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+      env:
+        BUILDKIT_PROGRESS: plain
+
+    - name: Verify frontend image
+      if: github.event_name != 'pull_request'
+      run: |
+        echo "✅ 前端镜像构建完成"
+        echo "镜像标签: ${{ env.REGISTRY }}/ai-travel-planner-frontend:${{ github.sha }}"
+        echo "构建时间: $(date)"
 
     - name: Generate deployment manifest
       if: github.event_name != 'pull_request'
@@ -96,3 +153,14 @@ jobs:
         name: deployment-manifest
         path: docker-compose.prod.yml
         retention-days: 30
+
+    - name: Display deployment information
+      if: github.event_name != 'pull_request'
+      run: |
+        echo "📦 部署清单已生成"
+        echo "后端镜像: ${{ env.REGISTRY }}/ai-travel-planner-backend:${{ github.sha }}"
+        echo "前端镜像: ${{ env.REGISTRY }}/ai-travel-planner-frontend:${{ github.sha }}"
+        echo "部署文件: docker-compose.prod.yml"
+        echo "生成时间: $(date)"
+        echo ""
+        echo "✅ 构建流程完成！"
