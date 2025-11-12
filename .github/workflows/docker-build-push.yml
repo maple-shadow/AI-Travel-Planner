@@ -10,8 +10,8 @@ on:
 env:
   REGISTRY: crpi-y34dw9cggtyfgmzy.cn-hangzhou.personal.cr.aliyuncs.com
   REPOSITORY_NAME: ai-travel-planner
-  BACKEND_IMAGE_NAME: ${{ env.REPOSITORY_NAME }}/backend
-  FRONTEND_IMAGE_NAME: ${{ env.REPOSITORY_NAME }}/frontend
+  BACKEND_IMAGE_NAME: ai-travel-planner/backend
+  FRONTEND_IMAGE_NAME: ai-travel-planner/frontend
 
 jobs:
   build-and-push:
