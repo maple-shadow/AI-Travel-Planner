@@ -8,7 +8,7 @@ on:
     branches: [ main, master ]
 
 env:
-  REGISTRY: crpi-y34dw9cggtyfgmzy.cn-hangzhou.personal.cr.aliyuncs.com
+  REGISTRY: crpi-y34dw9cggtyfgmzy.cn-hangzhou.personal.cr.aliyuncs.com/shiro-bako
   BACKEND_IMAGE_NAME: ai-travel-planner-backend
   FRONTEND_IMAGE_NAME: ai-travel-planner-frontend
 
