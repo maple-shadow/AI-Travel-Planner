@@ -23,7 +23,7 @@ FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # 复制Nginx配置
-COPY nginx.conf /etc/nginx/nginx.conf
+    COPY frontend/nginx.conf /etc/nginx/nginx.conf
 
 # 暴露端口
 EXPOSE 80
