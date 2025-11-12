@@ -9,9 +9,8 @@ on:
 
 env:
   REGISTRY: crpi-y34dw9cggtyfgmzy.cn-hangzhou.personal.cr.aliyuncs.com
-  REPOSITORY_NAME: ai-travel-planner
-  BACKEND_IMAGE_NAME: ai-travel-planner/backend
-  FRONTEND_IMAGE_NAME: ai-travel-planner/frontend
+  BACKEND_IMAGE_NAME: ${{ github.repository }}-backend
+  FRONTEND_IMAGE_NAME: ${{ github.repository }}-frontend
 
 jobs:
   build-and-push:
@@ -75,8 +74,8 @@ jobs:
       uses: docker/metadata-action@v5
       with:
         images: |
-          ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}
-          ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
+          ${{ env.REGISTRY }}/ai-travel-planner-backend
+          ${{ env.REGISTRY }}/ai-travel-planner-frontend
         tags: |
           type=ref,event=branch
           type=ref,event=pr
@@ -103,7 +102,7 @@ jobs:
         context: .
         file: backend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
+        tags: ${{ env.REGISTRY }}/ai-travel-planner-backend:${{ github.sha }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -114,7 +113,7 @@ jobs:
       if: github.event_name != 'pull_request'
       run: |
         echo "✅ 后端镜像构建完成"
-        echo "镜像标签: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}"
+        echo "镜像标签: ${{ env.REGISTRY }}/ai-travel-planner-backend:${{ github.sha }}"
         echo "构建时间: $(date)"
 
     - name: Build and push frontend image
@@ -123,7 +122,7 @@ jobs:
         context: .
         file: frontend/Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
+        tags: ${{ env.REGISTRY }}/ai-travel-planner-frontend:${{ github.sha }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -134,7 +133,7 @@ jobs:
       if: github.event_name != 'pull_request'
       run: |
         echo "✅ 前端镜像构建完成"
-        echo "镜像标签: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}"
+        echo "镜像标签: ${{ env.REGISTRY }}/ai-travel-planner-frontend:${{ github.sha }}"
         echo "构建时间: $(date)"
 
     - name: Generate deployment manifest
@@ -144,7 +143,7 @@ jobs:
         version: '3.8'
         services:
           backend:
-            image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
+            image: ${{ env.REGISTRY }}/ai-travel-planner-backend:${{ github.sha }}
             environment:
               - NODE_ENV=production
             ports:
@@ -152,7 +151,7 @@ jobs:
             restart: unless-stopped
             
           frontend:
-            image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
+            image: ${{ env.REGISTRY }}/ai-travel-planner-frontend:${{ github.sha }}
             ports:
               - "80:80"
             restart: unless-stopped
@@ -172,8 +171,8 @@ jobs:
       if: github.event_name != 'pull_request'
       run: |
         echo "📦 部署清单已生成"
-        echo "后端镜像: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}"
-        echo "前端镜像: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}"
+        echo "后端镜像: ${{ env.REGISTRY }}/ai-travel-planner-backend:${{ github.sha }}"
+        echo "前端镜像: ${{ env.REGISTRY }}/ai-travel-planner-frontend:${{ github.sha }}"
         echo "部署文件: docker-compose.prod.yml"
         echo "生成时间: $(date)"
         echo ""
