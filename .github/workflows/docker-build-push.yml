@@ -99,8 +99,8 @@ jobs:
     - name: Build and push backend image
       uses: docker/build-push-action@v5
       with:
-        context: .
-        file: ./backend/Dockerfile
+        context: ./backend
+        file: Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ env.REGISTRY }}/ai-travel-planner-backend:${{ github.sha }}
         labels: ${{ steps.meta.outputs.labels }}
@@ -119,8 +119,8 @@ jobs:
     - name: Build and push frontend image
       uses: docker/build-push-action@v5
       with:
-        context: .
-        file: ./frontend/Dockerfile
+        context: ./frontend
+        file: Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ env.REGISTRY }}/ai-travel-planner-frontend:${{ github.sha }}
         labels: ${{ steps.meta.outputs.labels }}
