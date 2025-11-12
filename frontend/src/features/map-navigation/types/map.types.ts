@@ -25,6 +25,21 @@ export interface LocationSearchResult {
     type?: string;
 }
 
+// POI搜索结果接口
+export interface POIResult {
+    id: string;
+    name: string;
+    address: string;
+    location: Location;
+    type?: string;
+    tel?: string;
+    distance?: number;
+    businessArea?: string; // 商圈信息
+    pname?: string; // 省份
+    cityname?: string; // 城市
+    adname?: string; // 区域
+}
+
 // 路线规划结果接口
 export interface RouteResult {
     distance: number; // 距离（米）

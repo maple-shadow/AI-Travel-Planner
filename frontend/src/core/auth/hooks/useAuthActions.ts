@@ -56,7 +56,7 @@ export const useAuthActions = (): UseAuthActionsReturn => {
             }
 
             await dispatch(registerUser({
-                name: data.name,
+                username: data.username,
                 email: data.email,
                 password: data.password
             })).unwrap();

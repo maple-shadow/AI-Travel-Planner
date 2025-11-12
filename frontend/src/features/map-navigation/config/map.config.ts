@@ -3,6 +3,7 @@
 // 高德地图API配置
 interface AMapConfig {
     apiKey: string;
+    securityKey?: string;
     version: string;
     plugins: string[];
 }
@@ -17,6 +18,7 @@ interface MapServiceConfig {
 // 默认地图配置
 export const defaultMapConfig: AMapConfig = {
     apiKey: import.meta.env.VITE_AMAP_API_KEY || 'your-amap-api-key',
+    securityKey: import.meta.env.VITE_AMAP_SECURITY_KEY,
     version: '2.0',
     plugins: [
         'AMap.Geolocation',

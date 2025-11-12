@@ -1,5 +1,10 @@
 import React from 'react';
 import { Trip, TripStatus } from '../types';
+import { Card, Typography, Button, Space, Tag, Row, Col } from 'antd';
+import { EditOutlined, DeleteOutlined, CopyOutlined, EyeOutlined, CalendarOutlined, DollarOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+
+const { Title, Text } = Typography;
 
 interface TripCardProps {
     trip: Trip;
@@ -17,7 +22,7 @@ const TripCard: React.FC<TripCardProps> = ({
     onView
 }) => {
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('zh-CN');
+        return dayjs(dateString).format('MM/DD');
     };
 
     const formatBudget = (budget: number) => {
@@ -27,15 +32,15 @@ const TripCard: React.FC<TripCardProps> = ({
     const getStatusColor = (status: TripStatus) => {
         switch (status) {
             case TripStatus.PLANNING:
-                return 'bg-blue-100 text-blue-800';
+                return 'blue';
             case TripStatus.IN_PROGRESS:
-                return 'bg-green-100 text-green-800';
+                return 'green';
             case TripStatus.COMPLETED:
-                return 'bg-gray-100 text-gray-800';
+                return 'gray';
             case TripStatus.CANCELLED:
-                return 'bg-red-100 text-red-800';
+                return 'red';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'default';
         }
     };
 
@@ -55,72 +60,102 @@ const TripCard: React.FC<TripCardProps> = ({
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-            <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-semibold text-gray-900 truncate">{trip.title}</h3>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(trip.status)}`}>
+        <Card
+            hoverable
+            style={{ height: '100%' }}
+            bodyStyle={{ padding: 16, height: '100%', display: 'flex', flexDirection: 'column' }}
+        >
+            {/* 头部信息 */}
+            <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Title level={4} style={{ margin: 0, flex: 1, marginRight: 8 }} ellipsis={{ tooltip: trip.title }}>
+                    {trip.title}
+                </Title>
+                <Tag color={getStatusColor(trip.status)}>
                     {getStatusText(trip.status)}
-                </span>
+                </Tag>
             </div>
 
+            {/* 描述信息 */}
             {trip.description && (
-                <p className="text-gray-600 mb-4 line-clamp-2">{trip.description}</p>
+                <Text type="secondary" style={{ marginBottom: 16, display: 'block' }} ellipsis={{ tooltip: trip.description }}>
+                    {trip.description}
+                </Text>
             )}
 
-            <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                    <span className="text-sm text-gray-500">开始日期</span>
-                    <p className="font-medium">{formatDate(trip.startDate)}</p>
-                </div>
-                <div>
-                    <span className="text-sm text-gray-500">结束日期</span>
-                    <p className="font-medium">{formatDate(trip.endDate)}</p>
-                </div>
-                <div>
-                    <span className="text-sm text-gray-500">预算</span>
-                    <p className="font-medium">{formatBudget(trip.budget)}</p>
-                </div>
-                <div>
-                    <span className="text-sm text-gray-500">创建时间</span>
-                    <p className="font-medium">{formatDate(trip.createdAt)}</p>
-                </div>
-            </div>
+            {/* 基本信息 */}
+            <Row gutter={[8, 8]} style={{ marginBottom: 16, flex: 1 }}>
+                <Col span={12}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <CalendarOutlined style={{ color: '#1890ff' }} />
+                        <Text type="secondary" style={{ fontSize: 12 }}>开始</Text>
+                    </div>
+                    <Text strong>{formatDate(trip.startDate)}</Text>
+                </Col>
+                <Col span={12}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <CalendarOutlined style={{ color: '#fa8c16' }} />
+                        <Text type="secondary" style={{ fontSize: 12 }}>结束</Text>
+                    </div>
+                    <Text strong>{formatDate(trip.endDate)}</Text>
+                </Col>
+                <Col span={12}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <DollarOutlined style={{ color: '#52c41a' }} />
+                        <Text type="secondary" style={{ fontSize: 12 }}>预算</Text>
+                    </div>
+                    <Text strong style={{ color: '#52c41a' }}>{formatBudget(trip.budget)}</Text>
+                </Col>
+                <Col span={12}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <CalendarOutlined style={{ color: '#666' }} />
+                        <Text type="secondary" style={{ fontSize: 12 }}>创建</Text>
+                    </div>
+                    <Text strong>{formatDate(trip.createdAt)}</Text>
+                </Col>
+            </Row>
 
-            <div className="flex justify-end space-x-2">
+            {/* 操作按钮 */}
+            <Space style={{ justifyContent: 'flex-end', width: '100%' }}>
                 {onView && (
-                    <button
+                    <Button
+                        type="primary"
+                        size="small"
+                        icon={<EyeOutlined />}
                         onClick={() => onView(trip)}
-                        className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                     >
-                        查看详情
-                    </button>
+                        查看
+                    </Button>
                 )}
                 {onEdit && (
-                    <button
+                    <Button
+                        size="small"
+                        icon={<EditOutlined />}
                         onClick={() => onEdit(trip)}
-                        className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
                     >
                         编辑
-                    </button>
+                    </Button>
                 )}
                 {onDuplicate && (
-                    <button
+                    <Button
+                        size="small"
+                        icon={<CopyOutlined />}
                         onClick={() => onDuplicate(trip.id)}
-                        className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
                     >
                         复制
-                    </button>
+                    </Button>
                 )}
                 {onDelete && (
-                    <button
+                    <Button
+                        danger
+                        size="small"
+                        icon={<DeleteOutlined />}
                         onClick={() => onDelete(trip.id)}
-                        className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                     >
                         删除
-                    </button>
+                    </Button>
                 )}
-            </div>
-        </div>
+            </Space>
+        </Card>
     );
 };
 

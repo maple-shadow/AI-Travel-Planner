@@ -19,9 +19,14 @@ export class BudgetService {
     // 创建预算
     static async createBudget(budgetData: CreateBudgetData): Promise<BudgetOperationResult> {
         try {
+            console.log('=== BudgetService.createBudget 开始 ===')
+            console.log('接收到的预算数据:', JSON.stringify(budgetData, null, 2))
+
             // 验证数据
             const validationErrors = BudgetValidators.validateCreateBudget(budgetData)
+            console.log('验证结果 - 错误数量:', validationErrors.length)
             if (validationErrors.length > 0) {
+                console.log('验证错误详情:', validationErrors)
                 return {
                     success: false,
                     validationErrors
@@ -29,21 +34,27 @@ export class BudgetService {
             }
 
             // 检查是否已存在该行程的预算
+            console.log('检查行程是否已存在预算, trip_id:', budgetData.trip_id)
             const existingBudget = await BudgetModel.findBudgetByTripId(budgetData.trip_id)
+            console.log('检查结果 - 已存在预算:', existingBudget ? '是' : '否')
             if (existingBudget) {
+                console.log('预算已存在错误')
                 return {
                     success: false,
                     error: '该行程已存在预算'
                 }
             }
 
+            console.log('开始创建预算...')
             const budget = await BudgetModel.createBudget(budgetData)
+            console.log('预算创建成功:', JSON.stringify(budget, null, 2))
 
             return {
                 success: true,
                 data: budget
             }
         } catch (error) {
+            console.error('BudgetService.createBudget 异常:', error)
             return {
                 success: false,
                 error: error instanceof Error ? error.message : '创建预算失败'
@@ -393,22 +404,35 @@ export class BudgetService {
         offset?: number
     }): Promise<BudgetOperationResult> {
         try {
+            console.log(`🔍 预算服务开始处理用户 ${userId} 的预算列表请求`)
+            console.log('📋 查询选项:', JSON.stringify(options || {}, null, 2))
+
             // 验证查询参数
             const validationErrors = BudgetValidators.validateBudgetQuery(options || {})
             if (validationErrors.length > 0) {
+                console.warn('❌ 查询参数验证失败:', validationErrors)
                 return {
                     success: false,
                     validationErrors
                 }
             }
 
+            console.log(`📊 准备调用预算模型获取用户 ${userId} 的预算数据`)
             const budgets = await BudgetModel.listUserBudgets(userId, options)
+
+            console.log(`📈 预算模型返回数据: 共 ${Array.isArray(budgets) ? budgets.length : 0} 条记录`)
+            if (Array.isArray(budgets) && budgets.length > 0) {
+                console.log('📄 预算记录示例:', JSON.stringify(budgets.slice(0, 2), null, 2))
+            } else {
+                console.warn('⚠️ 预算模型返回空数组或无数据')
+            }
 
             return {
                 success: true,
                 data: budgets
             }
         } catch (error) {
+            console.error('❌ 获取用户预算列表异常:', error)
             return {
                 success: false,
                 error: error instanceof Error ? error.message : '获取用户预算列表失败'

@@ -1,5 +1,5 @@
 // 预算管理API服务
-import axios from 'axios'
+import { api } from '../../../services/api-client'
 import {
     BudgetData,
     CreateBudgetData,
@@ -14,51 +14,15 @@ import {
     ApiResponse
 } from '../types'
 
-const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'http://localhost:3000/api'
-
-// 创建axios实例
-const budgetApi = axios.create({
-    baseURL: `${API_BASE_URL}/budgets`,
-    timeout: 10000,
-    headers: {
-        'Content-Type': 'application/json'
-    }
-})
-
-// 请求拦截器 - 添加认证token
-budgetApi.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('auth_token')
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`
-        }
-        return config
-    },
-    (error) => {
-        return Promise.reject(error)
-    }
-)
-
-// 响应拦截器 - 处理错误
-budgetApi.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            // 认证失败，跳转到登录页
-            localStorage.removeItem('auth_token')
-            window.location.href = '/login'
-        }
-        return Promise.reject(error)
-    }
-)
+const BUDGETS_BASE_URL = '/budgets'
 
 // 预算服务类
 export class BudgetService {
     // 创建预算
     static async createBudget(budgetData: CreateBudgetData): Promise<ApiResponse<BudgetData>> {
         try {
-            const response = await budgetApi.post('/', budgetData)
-            return response.data
+            const response = await api.post(BUDGETS_BASE_URL, budgetData)
+            return response
         } catch (error: any) {
             return {
                 success: false,
@@ -70,8 +34,8 @@ export class BudgetService {
     // 获取预算详情
     static async getBudgetById(id: string): Promise<ApiResponse<BudgetData>> {
         try {
-            const response = await budgetApi.get(`/${id}`)
-            return response.data
+            const response = await api.get(`${BUDGETS_BASE_URL}/${id}`)
+            return response
         } catch (error: any) {
             return {
                 success: false,
@@ -83,8 +47,8 @@ export class BudgetService {
     // 更新预算
     static async updateBudget(id: string, updateData: UpdateBudgetData): Promise<ApiResponse<BudgetData>> {
         try {
-            const response = await budgetApi.put(`/${id}`, updateData)
-            return response.data
+            const response = await api.put(`${BUDGETS_BASE_URL}/${id}`, updateData)
+            return response
         } catch (error: any) {
             return {
                 success: false,
@@ -96,8 +60,8 @@ export class BudgetService {
     // 删除预算
     static async deleteBudget(id: string): Promise<ApiResponse<boolean>> {
         try {
-            const response = await budgetApi.delete(`/${id}`)
-            return response.data
+            const response = await api.delete(`${BUDGETS_BASE_URL}/${id}`)
+            return response
         } catch (error: any) {
             return {
                 success: false,
@@ -109,9 +73,21 @@ export class BudgetService {
     // 添加开销
     static async addExpense(expenseData: CreateExpenseData): Promise<ApiResponse<ExpenseData>> {
         try {
-            const response = await budgetApi.post('/expenses', expenseData)
-            return response.data
+            console.log('=== BudgetService.addExpense 开始 ===')
+            console.log('发送的开销数据:', JSON.stringify(expenseData, null, 2))
+            console.log('API端点:', `${BUDGETS_BASE_URL}/expenses`)
+
+            const response = await api.post(`${BUDGETS_BASE_URL}/expenses`, expenseData)
+
+            console.log('API响应:', JSON.stringify(response.data, null, 2))
+            console.log('=== BudgetService.addExpense 结束 ===')
+
+            return response
         } catch (error: any) {
+            console.error('BudgetService.addExpense 错误:', error)
+            console.error('错误响应数据:', error.response?.data)
+            console.error('错误状态码:', error.response?.status)
+
             return {
                 success: false,
                 error: error.response?.data?.error || '添加开销失败'
@@ -122,8 +98,8 @@ export class BudgetService {
     // 更新开销
     static async updateExpense(id: string, updateData: UpdateExpenseData): Promise<ApiResponse<ExpenseData>> {
         try {
-            const response = await budgetApi.put(`/expenses/${id}`, updateData)
-            return response.data
+            const response = await api.put(`${BUDGETS_BASE_URL}/expenses/${id}`, updateData)
+            return response
         } catch (error: any) {
             return {
                 success: false,
@@ -135,8 +111,8 @@ export class BudgetService {
     // 删除开销
     static async deleteExpense(id: string): Promise<ApiResponse<boolean>> {
         try {
-            const response = await budgetApi.delete(`/expenses/${id}`)
-            return response.data
+            const response = await api.delete(`${BUDGETS_BASE_URL}/expenses/${id}`)
+            return response
         } catch (error: any) {
             return {
                 success: false,
@@ -148,8 +124,8 @@ export class BudgetService {
     // 获取预算使用情况
     static async getBudgetUsage(budgetId: string): Promise<ApiResponse<any>> {
         try {
-            const response = await budgetApi.get(`/${budgetId}/usage`)
-            return response.data
+            const response = await api.get(`${BUDGETS_BASE_URL}/${budgetId}/usage`)
+            return response
         } catch (error: any) {
             return {
                 success: false,
@@ -161,8 +137,8 @@ export class BudgetService {
     // 获取预算统计信息
     static async getBudgetStats(): Promise<ApiResponse<BudgetStats>> {
         try {
-            const response = await budgetApi.get('/stats')
-            return response.data
+            const response = await api.get(`${BUDGETS_BASE_URL}/stats`)
+            return response
         } catch (error: any) {
             return {
                 success: false,
@@ -174,8 +150,8 @@ export class BudgetService {
     // 获取开销统计信息
     static async getExpenseStats(budgetId: string): Promise<ApiResponse<ExpenseStats>> {
         try {
-            const response = await budgetApi.get(`/${budgetId}/expenses/stats`)
-            return response.data
+            const response = await api.get(`${BUDGETS_BASE_URL}/${budgetId}/expenses/stats`)
+            return response
         } catch (error: any) {
             return {
                 success: false,
@@ -190,8 +166,8 @@ export class BudgetService {
         period: 'daily' | 'weekly' | 'monthly' = 'monthly'
     ): Promise<ApiResponse<ExpenseTrends>> {
         try {
-            const response = await budgetApi.get(`/${budgetId}/trends?period=${period}`)
-            return response.data
+            const response = await api.get(`${BUDGETS_BASE_URL}/${budgetId}/trends?period=${period}`)
+            return response
         } catch (error: any) {
             return {
                 success: false,
@@ -203,8 +179,8 @@ export class BudgetService {
     // 生成预算分析报告
     static async generateBudgetReport(budgetId: string): Promise<ApiResponse<BudgetReport>> {
         try {
-            const response = await budgetApi.get(`/${budgetId}/report`)
-            return response.data
+            const response = await api.get(`${BUDGETS_BASE_URL}/${budgetId}/report`)
+            return response
         } catch (error: any) {
             return {
                 success: false,
@@ -221,12 +197,13 @@ export class BudgetService {
     }): Promise<ApiResponse<BudgetData[]>> {
         try {
             const params = new URLSearchParams()
+            params.append('user_id', userId)
             if (options?.status) params.append('status', options.status)
             if (options?.limit) params.append('limit', options.limit.toString())
             if (options?.offset) params.append('offset', options.offset.toString())
 
-            const response = await budgetApi.get(`/user/${userId}?${params.toString()}`)
-            return response.data
+            const response = await api.get(`${BUDGETS_BASE_URL}/?${params.toString()}`)
+            return response
         } catch (error: any) {
             return {
                 success: false,
@@ -249,8 +226,8 @@ export class BudgetService {
             if (options?.limit) params.append('limit', options.limit.toString())
             if (options?.offset) params.append('offset', options.offset.toString())
 
-            const response = await budgetApi.get(`/${budgetId}/expenses?${params.toString()}`)
-            return response.data
+            const response = await api.get(`${BUDGETS_BASE_URL}/${budgetId}/expenses?${params.toString()}`)
+            return response
         } catch (error: any) {
             return {
                 success: false,
@@ -264,8 +241,8 @@ export class BudgetService {
         budget_id?: string
         category?: string
         type?: string
-        date_from?: string
-        date_to?: string
+        expense_date_from?: string
+        expense_date_to?: string
         limit?: number
         offset?: number
     }): Promise<ApiResponse<ExpenseData[]>> {
@@ -274,13 +251,13 @@ export class BudgetService {
             if (options?.budget_id) params.append('budget_id', options.budget_id)
             if (options?.category) params.append('category', options.category)
             if (options?.type) params.append('type', options.type)
-            if (options?.date_from) params.append('date_from', options.date_from)
-            if (options?.date_to) params.append('date_to', options.date_to)
+            if (options?.expense_date_from) params.append('expense_date_from', options.expense_date_from)
+            if (options?.expense_date_to) params.append('expense_date_to', options.expense_date_to)
             if (options?.limit) params.append('limit', options.limit.toString())
             if (options?.offset) params.append('offset', options.offset.toString())
 
-            const response = await budgetApi.get(`/expenses/user?${params.toString()}`)
-            return response.data
+            const response = await api.get(`${BUDGETS_BASE_URL}/expenses/user?${params.toString()}`)
+            return response
         } catch (error: any) {
             return {
                 success: false,

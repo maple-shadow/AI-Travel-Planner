@@ -1,200 +1,110 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Form, Input, Button, Card, message, Typography } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+
+const { Title, Text } = Typography;
 
 interface LoginFormProps {
-    // 如果需要额外的props可以在这里定义
+    onSuccess?: () => void;
+    onError?: (error: string) => void;
+    onSwitchToRegister: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [rememberMe, setRememberMe] = useState(false);
-    const [formError, setFormError] = useState('');
-
-    const { login, loading, error, clearError } = useAuth();
+export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError, onSwitchToRegister }) => {
+    const [loading, setLoading] = useState(false);
+    const { login } = useAuth();
     const navigate = useNavigate();
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setFormError('');
-        clearError();
-
+    const onFinish = async (values: any) => {
+        setLoading(true);
         try {
-            await login({ email, password, rememberMe });
+            await login({
+                email: values.email,
+                password: values.password
+            });
+            message.success('登录成功！');
+            onSuccess?.();
             navigate('/dashboard');
-        } catch (err: any) {
-            setFormError(err.message || '登录失败，请重试');
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : '登录失败';
+            message.error(errorMessage);
+            onError?.(errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-            <div style={{ marginBottom: '1.5rem' }}>
-                <label htmlFor="email" style={{
-                    display: 'block',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                    color: 'var(--gray-700)',
-                    marginBottom: '0.5rem'
-                }}>
-                    邮箱地址
-                </label>
-                <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="form-input"
-                    placeholder="请输入您的邮箱"
-                    style={{
-                        width: '100%',
-                        padding: '0.75rem 1rem',
-                        border: '1px solid var(--gray-300)',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: '0.875rem',
-                        transition: 'all 0.2s',
-                        outline: 'none'
-                    }}
-                    onFocus={(e) => {
-                        (e.target as HTMLInputElement).style.borderColor = 'var(--primary-500)';
-                        (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px var(--primary-100)';
-                    }}
-                    onBlur={(e) => {
-                        (e.target as HTMLInputElement).style.borderColor = 'var(--gray-300)';
-                        (e.target as HTMLInputElement).style.boxShadow = 'none';
-                    }}
-                />
+        <Card style={{ maxWidth: 400, margin: '0 auto', marginTop: 100 }}>
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <Title level={2}>登录</Title>
+                <Text type="secondary">欢迎回到AI旅行规划器</Text>
             </div>
 
-            <div style={{ marginBottom: '1.5rem' }}>
-                <label htmlFor="password" style={{
-                    display: 'block',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                    color: 'var(--gray-700)',
-                    marginBottom: '0.5rem'
-                }}>
-                    密码
-                </label>
-                <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="form-input"
-                    placeholder="请输入您的密码"
-                    style={{
-                        width: '100%',
-                        padding: '0.75rem 1rem',
-                        border: '1px solid var(--gray-300)',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: '0.875rem',
-                        transition: 'all 0.2s',
-                        outline: 'none'
-                    }}
-                    onFocus={(e) => {
-                        (e.target as HTMLInputElement).style.borderColor = 'var(--primary-500)';
-                        (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px var(--primary-100)';
-                    }}
-                    onBlur={(e) => {
-                        (e.target as HTMLInputElement).style.borderColor = 'var(--gray-300)';
-                        (e.target as HTMLInputElement).style.boxShadow = 'none';
-                    }}
-                />
-            </div>
-
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '1.5rem'
-            }}>
-                <label style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    fontSize: '0.875rem',
-                    color: 'var(--gray-700)',
-                    cursor: 'pointer'
-                }}>
-                    <input
-                        type="checkbox"
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                        style={{
-                            marginRight: '0.5rem',
-                            width: '1rem',
-                            height: '1rem',
-                            borderRadius: 'var(--radius-sm)',
-                            border: '1px solid var(--gray-300)',
-                            cursor: 'pointer'
-                        }}
-                    />
-                    记住我
-                </label>
-                <Link
-                    to="/forgot-password"
-                    style={{
-                        fontSize: '0.875rem',
-                        color: 'var(--primary-600)',
-                        textDecoration: 'none',
-                        fontWeight: '500'
-                    }}
-                    onMouseEnter={(e) => (e.target as HTMLElement).style.textDecoration = 'underline'}
-                    onMouseLeave={(e) => (e.target as HTMLElement).style.textDecoration = 'none'}
-                >
-                    忘记密码？
-                </Link>
-            </div>
-
-            {(error || formError) && (
-                <div style={{
-                    padding: '0.75rem 1rem',
-                    backgroundColor: 'var(--red-50)',
-                    border: '1px solid var(--red-200)',
-                    borderRadius: 'var(--radius-md)',
-                    color: 'var(--red-700)',
-                    fontSize: '0.875rem',
-                    marginBottom: '1.5rem'
-                }}>
-                    {error || formError}
-                </div>
-            )}
-
-            <button
-                type="submit"
-                disabled={loading}
-                className="btn btn-primary"
-                style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                    position: 'relative'
-                }}
+            <Form
+                name="login"
+                onFinish={onFinish}
+                autoComplete="off"
+                layout="vertical"
             >
-                {loading ? (
-                    <>
-                        <span className="loading-spinner" style={{
-                            display: 'inline-block',
-                            width: '1rem',
-                            height: '1rem',
-                            border: '2px solid transparent',
-                            borderTop: '2px solid currentColor',
-                            borderRadius: '50%',
-                            animation: 'spin 1s linear infinite',
-                            marginRight: '0.5rem'
-                        }} />
-                        登录中...
-                    </>
-                ) : (
-                    '登录'
-                )}
-            </button>
-        </form>
+                <Form.Item
+                    label="邮箱"
+                    name="email"
+                    rules={[
+                        { required: true, message: '请输入邮箱' },
+                        { type: 'email', message: '请输入有效的邮箱地址' }
+                    ]}
+                >
+                    <Input
+                        prefix={<UserOutlined />}
+                        placeholder="请输入邮箱"
+                        size="large"
+                    />
+                </Form.Item>
+
+                <Form.Item
+                    label="密码"
+                    name="password"
+                    rules={[
+                        { required: true, message: '请输入密码' },
+                        { min: 8, message: '密码至少8个字符' },
+                        { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).+$/, message: '密码必须包含大小写字母、数字和特殊字符' }
+                    ]}
+                >
+                    <Input.Password
+                        prefix={<LockOutlined />}
+                        placeholder="请输入密码"
+                        size="large"
+                    />
+                </Form.Item>
+
+                <Form.Item>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading}
+                        size="large"
+                        block
+                    >
+                        登录
+                    </Button>
+                </Form.Item>
+            </Form>
+
+            <div style={{ textAlign: 'center', marginTop: 16 }}>
+                <Text type="secondary">
+                    还没有账号？{' '}
+                    <Button
+                        type="link"
+                        onClick={onSwitchToRegister}
+                        style={{ padding: 0 }}
+                    >
+                        立即注册
+                    </Button>
+                </Text>
+            </div>
+        </Card>
     );
 };
-
-export default LoginForm;

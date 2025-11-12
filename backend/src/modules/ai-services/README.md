@@ -2,7 +2,7 @@
 
 ## 模块概述
 
-AI服务集成模块是AI旅行规划师项目的核心AI能力提供模块，负责集成阿里云百炼AI服务和科大讯飞语音服务，为系统提供智能行程规划、预算分析和语音交互功能。
+AI服务集成模块是AI旅行规划师项目的核心AI能力提供模块，负责集成百炼API服务和科大讯飞语音服务，为系统提供智能行程规划、预算分析和语音交互功能。
 
 ## 功能特性
 
@@ -33,7 +33,7 @@ ai-services/
 │   ├── ai.budget.service.ts # 预算分析服务
 │   └── ai.voice.service.ts  # 语音服务
 ├── clients/                 # AI客户端
-│   ├── aliyun.client.ts    # 阿里云客户端
+│   ├── bailian.client.ts   # 百炼API客户端
 │   └── iflytek.client.ts   # 科大讯飞客户端
 ├── utils/                   # 工具函数
 │   └── ai.utils.ts         # AI工具函数
@@ -57,7 +57,7 @@ ai-services/
 1. **AITripService**: 行程规划AI服务
 2. **AIBudgetService**: 预算分析AI服务  
 3. **AIVoiceService**: 语音交互AI服务
-4. **AliyunAIClient**: 阿里云AI客户端
+4. **BailianAIClient**: 百炼API客户端
 5. **IflytekAIClient**: 科大讯飞AI客户端
 
 ## 安装和使用
@@ -67,10 +67,9 @@ ai-services/
 在 `.env` 文件中配置以下环境变量：
 
 ```bash
-# 阿里云配置
-ALIYUN_ACCESS_KEY_ID=your_access_key_id
-ALIYUN_ACCESS_KEY_SECRET=your_access_key_secret
-ALIYUN_AI_ENDPOINT=https://dashscope.aliyuncs.com/api/v1
+# 百炼API配置
+BAILIAN_API_KEY=your_bailian_api_key
+BAILIAN_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
 
 # 科大讯飞配置
 IFLYTEK_APP_ID=your_app_id
@@ -91,8 +90,8 @@ AI_VOICE_MODEL=iflytek-speech
 import { AITripService, AIBudgetService, AIVoiceService } from './modules/ai-services';
 
 // 初始化AI服务
-const tripService = new AITripService(aiConfig.aliyun);
-const budgetService = new AIBudgetService(aiConfig.aliyun);
+const tripService = new AITripService(aiConfig.bailian);
+const budgetService = new AIBudgetService(aiConfig.bailian);
 const voiceService = new AIVoiceService(aiConfig.iflytek);
 
 // 使用行程规划服务
@@ -172,7 +171,7 @@ interface AIError {
 
 常见错误代码：
 - `VALIDATION_ERROR`: 请求参数验证失败
-- `ALIYUN_API_ERROR`: 阿里云API调用错误
+- `BAILIAN_API_ERROR`: 百炼API调用错误
 - `IFLYTEK_API_ERROR`: 科大讯飞API调用错误
 - `RESPONSE_PARSE_ERROR`: AI响应解析错误
 

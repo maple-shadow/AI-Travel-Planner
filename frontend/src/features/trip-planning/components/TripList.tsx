@@ -1,6 +1,10 @@
 import React from 'react';
 import { Trip } from '../types';
 import TripCard from './TripCard';
+import { Row, Col, Empty, Skeleton, Typography } from 'antd';
+import { RocketOutlined } from '@ant-design/icons';
+
+const { Title, Text } = Typography;
 
 interface TripListProps {
     trips: Trip[];
@@ -21,51 +25,51 @@ const TripList: React.FC<TripListProps> = ({
 }) => {
     if (isLoading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Row gutter={[16, 16]}>
                 {[...Array(6)].map((_, index) => (
-                    <div key={index} className="bg-white rounded-lg shadow-md p-6 animate-pulse">
-                        <div className="h-6 bg-gray-200 rounded mb-4"></div>
-                        <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                        <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div className="h-3 bg-gray-200 rounded"></div>
-                            <div className="h-3 bg-gray-200 rounded"></div>
-                            <div className="h-3 bg-gray-200 rounded"></div>
-                            <div className="h-3 bg-gray-200 rounded"></div>
-                        </div>
-                        <div className="flex justify-end space-x-2">
-                            <div className="h-8 bg-gray-200 rounded w-20"></div>
-                            <div className="h-8 bg-gray-200 rounded w-16"></div>
-                        </div>
-                    </div>
+                    <Col key={index} xs={24} sm={12} lg={8}>
+                        <Skeleton
+                            active
+                            avatar={false}
+                            title={{ width: '80%' }}
+                            paragraph={{ rows: 4, width: ['100%', '100%', '100%', '60%'] }}
+                        />
+                    </Col>
                 ))}
-            </div>
+            </Row>
         );
     }
 
     if (trips.length === 0) {
         return (
-            <div className="text-center py-12">
-                <div className="text-gray-400 text-6xl mb-4">✈️</div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">暂无行程</h3>
-                <p className="text-gray-500">开始创建您的第一个旅行计划吧！</p>
-            </div>
+            <Empty
+                image={<RocketOutlined style={{ fontSize: 64, color: '#d9d9d9' }} />}
+                imageStyle={{ height: 80 }}
+                description={
+                    <div>
+                        <Title level={4} style={{ marginBottom: 8 }}>暂无行程</Title>
+                        <Text type="secondary">开始创建您的第一个旅行计划吧！</Text>
+                    </div>
+                }
+                style={{ padding: '40px 0' }}
+            />
         );
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Row gutter={[16, 16]}>
             {trips.map((trip) => (
-                <TripCard
-                    key={trip.id}
-                    trip={trip}
-                    onEdit={onEditTrip}
-                    onDelete={onDeleteTrip}
-                    onDuplicate={onDuplicateTrip}
-                    onView={onViewTrip}
-                />
+                <Col key={trip.id} xs={24} sm={12} lg={8}>
+                    <TripCard
+                        trip={trip}
+                        onEdit={onEditTrip}
+                        onDelete={onDeleteTrip}
+                        onDuplicate={onDuplicateTrip}
+                        onView={onViewTrip}
+                    />
+                </Col>
             ))}
-        </div>
+        </Row>
     );
 };
 

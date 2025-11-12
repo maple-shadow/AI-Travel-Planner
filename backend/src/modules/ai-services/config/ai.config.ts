@@ -5,10 +5,9 @@ import { AIServiceConfig, ModelConfig } from '../types/ai.types';
  * 从环境变量加载AI服务配置
  */
 export const aiServiceConfig: AIServiceConfig = {
-    aliyun: {
-        accessKeyId: process.env.ALIYUN_ACCESS_KEY_ID || '',
-        accessKeySecret: process.env.ALIYUN_ACCESS_KEY_SECRET || '',
-        endpoint: process.env.ALIYUN_AI_ENDPOINT || 'https://dashscope.aliyuncs.com/api/v1'
+    bailian: {
+        apiKey: process.env.BAILIAN_API_KEY || process.env.ALIYUN_BAILIAN_API_KEY || 'sk-601129fd251647e282930550a0066d36',
+        baseURL: process.env.BAILIAN_BASE_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1'
     },
     iflytek: {
         appId: process.env.IFLYTEK_APP_ID || '',
@@ -47,8 +46,6 @@ export const modelConfig: ModelConfig = {
  */
 export const validateAIConfig = (): boolean => {
     const requiredEnvVars = [
-        'ALIYUN_ACCESS_KEY_ID',
-        'ALIYUN_ACCESS_KEY_SECRET',
         'IFLYTEK_APP_ID',
         'IFLYTEK_API_KEY',
         'IFLYTEK_API_SECRET'

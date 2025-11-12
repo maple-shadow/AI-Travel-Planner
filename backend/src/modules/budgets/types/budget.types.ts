@@ -52,7 +52,7 @@ export interface ExpenseData {
     category: BudgetCategory
     type: ExpenseType
     description: string
-    date: Date
+    expense_date: Date
     location?: string
     receipt_url?: string
     tags?: string[]
@@ -81,7 +81,7 @@ export interface CreateExpenseData {
     category: BudgetCategory
     type?: ExpenseType
     description: string
-    date: Date
+    expense_date: Date
     location?: string
     receipt_url?: string
     tags?: string[]
@@ -105,7 +105,7 @@ export interface UpdateExpenseData {
     category?: BudgetCategory
     type?: ExpenseType
     description?: string
-    date?: Date
+    expense_date?: Date
     location?: string
     receipt_url?: string
     tags?: string[]

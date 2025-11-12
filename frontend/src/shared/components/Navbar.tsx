@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '../hooks';
+import { useAppSelector, useAppDispatch } from '../../core/store/hooks';
 import { logout } from '../../core/store/authSlice';
 
 const Navbar: React.FC = () => {
@@ -43,6 +43,12 @@ const Navbar: React.FC = () => {
                         className={`navbar-link ${isActive('/trips') ? 'active' : ''}`}
                     >
                         我的行程
+                    </Link>
+                    <Link
+                        to="/ai-trip-planner"
+                        className={`navbar-link ${isActive('/ai-trip-planner') ? 'active' : ''}`}
+                    >
+                        AI旅行规划
                     </Link>
                     <Link
                         to="/budgets"

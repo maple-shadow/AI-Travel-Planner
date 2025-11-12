@@ -48,7 +48,7 @@ export interface BudgetData {
 
 // 创建预算数据接口
 export interface CreateBudgetData {
-    trip_id?: string
+    trip_id: string
     user_id: string
     title: string
     description?: string
@@ -82,7 +82,7 @@ export interface ExpenseData {
     currency: string
     category: BudgetCategory
     type: ExpenseType
-    date: string
+    expense_date: string
     location?: string
     created_at: string
     updated_at: string
@@ -98,7 +98,7 @@ export interface CreateExpenseData {
     currency?: string
     category?: BudgetCategory
     type?: ExpenseType
-    date?: string
+    expense_date?: string
     location?: string
 }
 
@@ -110,7 +110,7 @@ export interface UpdateExpenseData {
     currency?: string
     category?: BudgetCategory
     type?: ExpenseType
-    date?: string
+    expense_date?: string
     location?: string
 }
 

@@ -7,7 +7,7 @@ class UserService {
     // 获取用户资料
     async fetchUserProfile(): Promise<UserProfile> {
         try {
-            const response = await fetch(`${this.baseUrl}/profile`, {
+            const response = await fetch('/api/auth/me', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -20,7 +20,24 @@ class UserService {
             }
 
             const data = await response.json();
-            return data.user;
+
+            // 将后端返回的用户数据转换为前端需要的格式
+            const userData = data.data.user;
+            return {
+                id: userData.id,
+                name: userData.username,
+                email: userData.email,
+                avatar: userData.avatar || '',
+                phone: userData.phone || '',
+                bio: userData.bio || '',
+                location: userData.location || '',
+                preferences: userData.preferences || {},
+                travelCount: userData.travelCount || 0,
+                favoriteCount: userData.favoriteCount || 0,
+                reviewCount: userData.reviewCount || 0,
+                createdAt: userData.createdAt,
+                updatedAt: userData.updatedAt
+            };
         } catch (error) {
             console.error('获取用户资料失败:', error);
             throw error;

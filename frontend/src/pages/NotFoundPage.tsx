@@ -1,37 +1,61 @@
 // 404错误页面
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Card, Typography, Button, Space } from 'antd';
+import { HomeOutlined, ArrowLeftOutlined, FrownOutlined } from '@ant-design/icons';
+
+const { Title, Text } = Typography;
 
 const NotFoundPage: React.FC = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full text-center">
+        <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+            <Card
+                style={{
+                    maxWidth: 500,
+                    width: '100%',
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
+                }}
+            >
                 <div className="text-center">
-                    <h1 className="text-9xl font-bold text-gray-300">404</h1>
-                    <h2 className="mt-4 text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                    {/* 404图标 */}
+                    <FrownOutlined style={{ fontSize: '80px', color: '#667eea', marginBottom: '24px' }} />
+
+                    {/* 标题 */}
+                    <Title level={1} style={{ fontSize: '120px', margin: 0, color: '#667eea', lineHeight: 1 }}>
+                        404
+                    </Title>
+
+                    <Title level={3} style={{ marginTop: '16px', marginBottom: '8px', color: '#1f2937' }}>
                         页面未找到
-                    </h2>
-                    <p className="mt-4 text-lg text-gray-600">
+                    </Title>
+
+                    <Text type="secondary" style={{ fontSize: '16px' }}>
                         抱歉，您访问的页面不存在。
-                    </p>
-                    <div className="mt-8">
-                        <button
+                    </Text>
+
+                    {/* 操作按钮 */}
+                    <Space size="middle" style={{ marginTop: '32px' }}>
+                        <Button
+                            type="primary"
+                            size="large"
+                            icon={<HomeOutlined />}
                             onClick={() => navigate('/dashboard')}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                         >
                             返回仪表板
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                            size="large"
+                            icon={<ArrowLeftOutlined />}
                             onClick={() => navigate(-1)}
-                            className="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                         >
                             返回上页
-                        </button>
-                    </div>
+                        </Button>
+                    </Space>
                 </div>
-            </div>
+            </Card>
         </div>
     );
 };

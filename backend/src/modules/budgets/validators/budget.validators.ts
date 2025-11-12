@@ -3,93 +3,128 @@ import { CreateBudgetData, UpdateBudgetData, CreateExpenseData, UpdateExpenseDat
 export class BudgetValidators {
     // 验证预算创建数据
     static validateCreateBudget(data: CreateBudgetData): BudgetValidationError[] {
+        console.log('=== BudgetValidators.validateCreateBudget 开始 ===')
+        console.log('验证数据:', JSON.stringify(data, null, 2))
+
         const errors: BudgetValidationError[] = []
 
         // 验证行程ID
         if (!data.trip_id || data.trip_id.trim() === '') {
+            console.log('验证失败: 行程ID为空')
             errors.push({
                 field: 'trip_id',
                 message: '行程ID不能为空',
                 code: 'TRIP_ID_REQUIRED'
             })
+        } else {
+            console.log('行程ID验证通过:', data.trip_id)
         }
 
         // 验证用户ID
         if (!data.user_id || data.user_id.trim() === '') {
+            console.log('验证失败: 用户ID为空')
             errors.push({
                 field: 'user_id',
                 message: '用户ID不能为空',
                 code: 'USER_ID_REQUIRED'
             })
+        } else {
+            console.log('用户ID验证通过:', data.user_id)
         }
 
         // 验证总金额
         if (data.total_amount === undefined || data.total_amount === null) {
+            console.log('验证失败: 总金额为空')
             errors.push({
                 field: 'total_amount',
                 message: '总金额不能为空',
                 code: 'TOTAL_AMOUNT_REQUIRED'
             })
         } else if (data.total_amount <= 0) {
+            console.log('验证失败: 总金额小于等于0:', data.total_amount)
             errors.push({
                 field: 'total_amount',
                 message: '总金额必须大于0',
                 code: 'TOTAL_AMOUNT_INVALID'
             })
         } else if (data.total_amount > 1000000) {
+            console.log('验证失败: 总金额超过限制:', data.total_amount)
             errors.push({
                 field: 'total_amount',
                 message: '总金额不能超过1,000,000',
                 code: 'TOTAL_AMOUNT_TOO_LARGE'
             })
+        } else {
+            console.log('总金额验证通过:', data.total_amount)
         }
 
         // 验证开始日期
         if (!data.start_date) {
+            console.log('验证失败: 开始日期为空')
             errors.push({
                 field: 'start_date',
                 message: '开始日期不能为空',
                 code: 'START_DATE_REQUIRED'
             })
         } else if (new Date(data.start_date) < new Date()) {
+            console.log('验证失败: 开始日期早于当前日期:', data.start_date)
             errors.push({
                 field: 'start_date',
                 message: '开始日期不能早于当前日期',
                 code: 'START_DATE_INVALID'
             })
+        } else {
+            console.log('开始日期验证通过:', data.start_date)
         }
 
         // 验证结束日期
         if (!data.end_date) {
+            console.log('验证失败: 结束日期为空')
             errors.push({
                 field: 'end_date',
                 message: '结束日期不能为空',
                 code: 'END_DATE_REQUIRED'
             })
         } else if (new Date(data.end_date) <= new Date(data.start_date)) {
+            console.log('验证失败: 结束日期不晚于开始日期:', data.end_date)
             errors.push({
                 field: 'end_date',
                 message: '结束日期必须晚于开始日期',
                 code: 'END_DATE_INVALID'
             })
+        } else {
+            console.log('结束日期验证通过:', data.end_date)
         }
 
         // 验证货币
         if (data.currency && data.currency.length !== 3) {
+            console.log('验证失败: 货币代码长度不为3:', data.currency)
             errors.push({
                 field: 'currency',
                 message: '货币代码必须是3个字符',
                 code: 'CURRENCY_INVALID'
             })
+        } else if (data.currency) {
+            console.log('货币代码验证通过:', data.currency)
         }
 
         // 验证备注长度
         if (data.notes && data.notes.length > 500) {
+            console.log('验证失败: 备注超过500字符:', data.notes.length)
             errors.push({
                 field: 'notes',
                 message: '备注不能超过500个字符',
                 code: 'NOTES_TOO_LONG'
             })
+        } else if (data.notes) {
+            console.log('备注验证通过:', data.notes.length, '字符')
+        }
+
+        console.log('验证完成 - 错误数量:', errors.length)
+        if (errors.length > 0) {
+            console.log('验证错误详情:', errors)
+        } else {
+            console.log('所有验证通过')
         }
 
         return errors
@@ -223,15 +258,15 @@ export class BudgetValidators {
         }
 
         // 验证日期
-        if (!data.date) {
+        if (!data.expense_date) {
             errors.push({
-                field: 'date',
+                field: 'expense_date',
                 message: '日期不能为空',
                 code: 'DATE_REQUIRED'
             })
-        } else if (new Date(data.date) > new Date()) {
+        } else if (new Date(data.expense_date) > new Date()) {
             errors.push({
-                field: 'date',
+                field: 'expense_date',
                 message: '日期不能晚于当前日期',
                 code: 'DATE_INVALID'
             })
@@ -310,9 +345,9 @@ export class BudgetValidators {
         }
 
         // 验证日期
-        if (data.date && new Date(data.date) > new Date()) {
+        if (data.expense_date && new Date(data.expense_date) > new Date()) {
             errors.push({
-                field: 'date',
+                field: 'expense_date',
                 message: '日期不能晚于当前日期',
                 code: 'DATE_INVALID'
             })

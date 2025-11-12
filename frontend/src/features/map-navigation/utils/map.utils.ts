@@ -1,4 +1,4 @@
-import { Location, MapMarker } from '../types/map.types';
+import { Location } from '../types/map.types';
 
 /**
  * 地图工具函数
@@ -68,7 +68,7 @@ export const calculateCenter = (points: Location[]): Location => {
 /**
  * 计算适合的缩放级别
  */
-export const calculateZoomLevel = (points: Location[], mapWidth: number, mapHeight: number): number => {
+export const calculateZoomLevel = (points: Location[]): number => {
     if (points.length <= 1) {
         return 13; // 默认缩放级别
     }
@@ -134,7 +134,7 @@ export const isValidCoordinate = (location: Location): boolean => {
 /**
  * 坐标转换（如果需要）
  */
-export const convertCoordinate = (location: Location, from: string, to: string): Location => {
+export const convertCoordinate = (location: Location): Location => {
     // 这里可以实现坐标系统转换
     // 目前直接返回原坐标
     return location;
@@ -143,7 +143,7 @@ export const convertCoordinate = (location: Location, from: string, to: string):
 /**
  * 创建标记图标URL
  */
-export const createMarkerIcon = (color: string = '#FF6B6B', text?: string): string => {
+export const createMarkerIcon = (): string => {
     // 这里可以返回自定义标记图标的URL
     // 目前返回空字符串，使用默认标记
     return '';
@@ -163,11 +163,11 @@ export const debounce = <T extends (...args: any[]) => any>(
     func: T,
     wait: number
 ): ((...args: Parameters<T>) => void) => {
-    let timeout: NodeJS.Timeout;
+    let timeout: number;
 
     return (...args: Parameters<T>) => {
         clearTimeout(timeout);
-        timeout = setTimeout(() => func(...args), wait);
+        timeout = window.setTimeout(() => func(...args), wait);
     };
 };
 

@@ -30,6 +30,7 @@ export class AIRoutes {
 
         // 语音服务相关路由
         this.router.post('/voice/transcribe', AIValidators.validateVoiceRecognitionRequest, this.aiController.transcribeSpeech);
+        // WebSocket路由需要在应用级别配置，这里只保留HTTP路由
         this.router.post('/voice/generate', AIValidators.validateTextToSpeechRequest, this.aiController.generateSpeech);
         this.router.post('/voice/intent', AIValidators.validateVoiceIntentRequest, this.aiController.analyzeVoiceIntent);
 

@@ -1,5 +1,10 @@
 import React from 'react';
 import { Trip, TripStatus } from '../types';
+import { Card, Typography, Button, Row, Col, Tag, Space } from 'antd';
+import { EditOutlined, ArrowLeftOutlined, CalendarOutlined, EnvironmentOutlined, DollarOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+
+const { Title, Text } = Typography;
 
 interface TripDetailProps {
     trip: Trip;
@@ -9,11 +14,7 @@ interface TripDetailProps {
 
 const TripDetail: React.FC<TripDetailProps> = ({ trip, onEdit, onBack }) => {
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('zh-CN', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+        return dayjs(dateString).format('YYYY年MM月DD日');
     };
 
     const formatBudget = (budget: number) => {
@@ -23,15 +24,15 @@ const TripDetail: React.FC<TripDetailProps> = ({ trip, onEdit, onBack }) => {
     const getStatusColor = (status: TripStatus) => {
         switch (status) {
             case TripStatus.PLANNING:
-                return 'bg-blue-100 text-blue-800';
+                return 'blue';
             case TripStatus.IN_PROGRESS:
-                return 'bg-green-100 text-green-800';
+                return 'green';
             case TripStatus.COMPLETED:
-                return 'bg-gray-100 text-gray-800';
+                return 'gray';
             case TripStatus.CANCELLED:
-                return 'bg-red-100 text-red-800';
+                return 'red';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'default';
         }
     };
 
@@ -51,93 +52,121 @@ const TripDetail: React.FC<TripDetailProps> = ({ trip, onEdit, onBack }) => {
     };
 
     const calculateDuration = (startDate: string, endDate: string) => {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const diffTime = Math.abs(end.getTime() - start.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays + 1; // 包含开始和结束日期的总天数
+        const start = dayjs(startDate);
+        const end = dayjs(endDate);
+        return end.diff(start, 'day') + 1; // 包含开始和结束日期的总天数
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center space-x-4">
-                    {onBack && (
-                        <button
-                            onClick={onBack}
-                            className="text-gray-500 hover:text-gray-700 transition-colors"
-                        >
-                            ← 返回
-                        </button>
-                    )}
-                    <h1 className="text-3xl font-bold text-gray-900">{trip.title}</h1>
+        <Card style={{ maxWidth: 800, margin: '0 auto' }}>
+            {/* 头部信息 */}
+            <div style={{ marginBottom: 24 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        {onBack && (
+                            <Button
+                                type="text"
+                                icon={<ArrowLeftOutlined />}
+                                onClick={onBack}
+                                style={{ color: '#666' }}
+                            >
+                                返回
+                            </Button>
+                        )}
+                        <Title level={2} style={{ margin: 0 }}>{trip.title}</Title>
+                    </div>
+                    <Space>
+                        <Tag color={getStatusColor(trip.status)}>
+                            {getStatusText(trip.status)}
+                        </Tag>
+                        {onEdit && (
+                            <Button
+                                type="primary"
+                                icon={<EditOutlined />}
+                                onClick={onEdit}
+                            >
+                                编辑行程
+                            </Button>
+                        )}
+                    </Space>
                 </div>
-                <div className="flex items-center space-x-3">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(trip.status)}`}>
-                        {getStatusText(trip.status)}
-                    </span>
-                    {onEdit && (
-                        <button
-                            onClick={onEdit}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-                        >
-                            编辑行程
-                        </button>
-                    )}
-                </div>
+
+                {trip.description && (
+                    <div style={{ marginBottom: 16 }}>
+                        <Text type="secondary">{trip.description}</Text>
+                    </div>
+                )}
             </div>
 
-            {trip.description && (
-                <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">行程描述</h3>
-                    <p className="text-gray-600 leading-relaxed">{trip.description}</p>
-                </div>
-            )}
+            {/* 基本信息卡片 */}
+            <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+                <Col xs={24} sm={12} md={6}>
+                    <Card size="small" style={{ textAlign: 'center' }}>
+                        <EnvironmentOutlined style={{ fontSize: 24, color: '#1890ff', marginBottom: 8 }} />
+                        <Text strong style={{ display: 'block', marginBottom: 4 }}>目的地</Text>
+                        <Text>{trip.destination}</Text>
+                    </Card>
+                </Col>
+                <Col xs={24} sm={12} md={6}>
+                    <Card size="small" style={{ textAlign: 'center' }}>
+                        <CalendarOutlined style={{ fontSize: 24, color: '#52c41a', marginBottom: 8 }} />
+                        <Text strong style={{ display: 'block', marginBottom: 4 }}>开始日期</Text>
+                        <Text>{formatDate(trip.startDate)}</Text>
+                    </Card>
+                </Col>
+                <Col xs={24} sm={12} md={6}>
+                    <Card size="small" style={{ textAlign: 'center' }}>
+                        <CalendarOutlined style={{ fontSize: 24, color: '#fa8c16', marginBottom: 8 }} />
+                        <Text strong style={{ display: 'block', marginBottom: 4 }}>结束日期</Text>
+                        <Text>{formatDate(trip.endDate)}</Text>
+                    </Card>
+                </Col>
+                <Col xs={24} sm={12} md={6}>
+                    <Card size="small" style={{ textAlign: 'center' }}>
+                        <ClockCircleOutlined style={{ fontSize: 24, color: '#722ed1', marginBottom: 8 }} />
+                        <Text strong style={{ display: 'block', marginBottom: 4 }}>行程天数</Text>
+                        <Text>{calculateDuration(trip.startDate, trip.endDate)} 天</Text>
+                    </Card>
+                </Col>
+            </Row>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-500 mb-1">目的地</h4>
-                    <p className="text-lg font-semibold text-gray-900">{trip.destination}</p>
-                </div>
+            {/* 预算和创建时间 */}
+            <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+                <Col xs={24} sm={12}>
+                    <Card size="small">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                            <DollarOutlined style={{ fontSize: 20, color: '#52c41a' }} />
+                            <div>
+                                <Text strong style={{ display: 'block', marginBottom: 4 }}>预算</Text>
+                                <Title level={3} style={{ margin: 0, color: '#52c41a' }}>
+                                    {formatBudget(trip.budget)}
+                                </Title>
+                            </div>
+                        </div>
+                    </Card>
+                </Col>
+                <Col xs={24} sm={12}>
+                    <Card size="small">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                            <CalendarOutlined style={{ fontSize: 20, color: '#1890ff' }} />
+                            <div>
+                                <Text strong style={{ display: 'block', marginBottom: 4 }}>创建时间</Text>
+                                <Text>{formatDate(trip.createdAt)}</Text>
+                            </div>
+                        </div>
+                    </Card>
+                </Col>
+            </Row>
 
-                <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-500 mb-1">开始日期</h4>
-                    <p className="text-lg font-semibold text-gray-900">{formatDate(trip.startDate)}</p>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-500 mb-1">结束日期</h4>
-                    <p className="text-lg font-semibold text-gray-900">{formatDate(trip.endDate)}</p>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-500 mb-1">行程天数</h4>
-                    <p className="text-lg font-semibold text-gray-900">
-                        {calculateDuration(trip.startDate, trip.endDate)} 天
-                    </p>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-500 mb-1">预算</h4>
-                    <p className="text-2xl font-bold text-green-600">{formatBudget(trip.budget)}</p>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-500 mb-1">创建时间</h4>
-                    <p className="text-lg font-semibold text-gray-900">{formatDate(trip.createdAt)}</p>
-                </div>
-            </div>
-
+            {/* 最后更新时间 */}
             {trip.updatedAt && trip.updatedAt !== trip.createdAt && (
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                    <p className="text-sm text-gray-500">
+                <div style={{ textAlign: 'center', paddingTop: 16, borderTop: '1px solid #f0f0f0' }}>
+                    <Text type="secondary">
                         最后更新: {formatDate(trip.updatedAt)}
-                    </p>
+                    </Text>
                 </div>
             )}
-        </div>
+        </Card>
     );
 };
 

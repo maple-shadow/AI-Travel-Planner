@@ -10,7 +10,7 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-    name: string;
+    username: string;
     email: string;
     password: string;
 }
@@ -28,9 +28,11 @@ export class AuthService {
     // 登录
     static async login(credentials: LoginRequest): Promise<AuthResponse> {
         try {
-            const response = await api.post<AuthResponse>('/auth/login', credentials);
-            this.setAuthData(response);
-            return response;
+            const response = await api.post<any>('/auth/login', credentials);
+            // 后端返回格式为 { success, message, data: { user, token } }
+            const authData = response.data;
+            this.setAuthData(authData);
+            return authData;
         } catch (error) {
             console.error('Login failed:', error);
             throw error;
@@ -40,9 +42,11 @@ export class AuthService {
     // 注册
     static async register(userData: RegisterRequest): Promise<AuthResponse> {
         try {
-            const response = await api.post<AuthResponse>('/auth/register', userData);
-            this.setAuthData(response);
-            return response;
+            const response = await api.post<any>('/auth/register', userData);
+            // 后端返回格式为 { success, message, data: { user, token } }
+            const authData = response.data;
+            this.setAuthData(authData);
+            return authData;
         } catch (error) {
             console.error('Registration failed:', error);
             throw error;
@@ -108,7 +112,7 @@ export class AuthService {
     // 验证token
     static async validateToken(): Promise<boolean> {
         try {
-            await api.get('/auth/validate');
+            await api.get('/auth/verify');
             return true;
         } catch (error) {
             console.error('Token validation failed:', error);
@@ -117,9 +121,16 @@ export class AuthService {
     }
 
     // 设置认证数据
-    private static setAuthData(authData: AuthResponse): void {
-        this.setToken(authData.token);
-        this.setUser(authData.user);
+    private static setAuthData(authData: any): void {
+        // 后端返回格式为 { success, message, data: { user, token } }
+        if (authData.data && authData.data.user && authData.data.token) {
+            this.setToken(authData.data.token);
+            this.setUser(authData.data.user);
+        } else {
+            // 兼容直接传入 { user, token } 的情况
+            this.setToken(authData.token);
+            this.setUser(authData.user);
+        }
     }
 
     // 设置token

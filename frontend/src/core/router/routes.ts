@@ -11,7 +11,7 @@ const NotFoundPage = lazy(() => import('../../pages/NotFoundPage'));
 const TripListPage = lazy(() => import('../../features/trip-planning/pages/TripListPage'));
 const BudgetManagerPage = lazy(() => import('../../features/budget-manager/pages/BudgetManagerPage'));
 const MapNavigationPage = lazy(() => import('../../features/map-navigation/pages/MapNavigationPage'));
-const VoiceRecognitionPage = lazy(() => import('../../features/voice-recognition/pages/VoiceRecognitionPage'));
+const AITripPlannerPage = lazy(() => import('../../features/ai-trip-planner/pages/AITripPlannerPage'));
 
 // 公开路由（无需认证）
 export const publicRoutes: RouteConfig[] = [
@@ -76,11 +76,11 @@ export const privateRoutes: RouteConfig[] = [
         title: '地图导航 - AI旅行规划器',
     },
     {
-        path: '/voice-recognition',
-        component: VoiceRecognitionPage,
+        path: '/ai-trip-planner',
+        component: AITripPlannerPage,
         exact: true,
         isPrivate: true,
-        title: '语音识别 - AI旅行规划器',
+        title: 'AI旅行规划 - AI旅行规划器',
     },
 ];
 

@@ -24,7 +24,7 @@ export const useDataSync = (config: Partial<SyncConfig> = {}) => {
     const [conflicts, setConflicts] = useState<SyncConflict[]>([]);
     const [error, setError] = useState<string | null>(null);
 
-    const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const syncIntervalRef = useRef<number | null>(null);
     const retryCountRef = useRef<number>(0);
 
     const mergedConfig = { ...DEFAULT_CONFIG, ...config };

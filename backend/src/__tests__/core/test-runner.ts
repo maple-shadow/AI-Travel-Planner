@@ -41,7 +41,7 @@ export class TestRunner {
                     console.log(`  ✅ ${testCase.name}`);
                 } catch (error) {
                     failed++;
-                    console.log(`  ❌ ${testCase.name}: ${error.message}`);
+                    console.log(`  ❌ ${testCase.name}: ${error instanceof Error ? error.message : '未知错误'}`);
                 }
             }
         }
@@ -124,7 +124,7 @@ export const testUtils = {
      * 模拟API调用
      */
     mockApiCalls: (endpoint: string, response: any, status = 200) => {
-        return jest.fn().mockResolvedValue({
+        return jest.fn<() => Promise<{ status: number, data: any }>>().mockResolvedValue({
             status,
             data: response
         });
@@ -135,17 +135,17 @@ export const testUtils = {
      */
     mockDatabase: (table: string, operations: any) => {
         return {
-            select: jest.fn().mockReturnValue({
-                eq: jest.fn().mockResolvedValue(operations.select || [])
+            select: jest.fn<() => any>().mockReturnValue({
+                eq: jest.fn<() => Promise<any>>().mockResolvedValue(operations.select || [])
             }),
-            insert: jest.fn().mockReturnValue({
-                select: jest.fn().mockResolvedValue(operations.insert || {})
+            insert: jest.fn<() => any>().mockReturnValue({
+                select: jest.fn<() => Promise<any>>().mockResolvedValue(operations.insert || {})
             }),
-            update: jest.fn().mockReturnValue({
-                eq: jest.fn().mockResolvedValue(operations.update || {})
+            update: jest.fn<() => any>().mockReturnValue({
+                eq: jest.fn<() => Promise<any>>().mockResolvedValue(operations.update || {})
             }),
-            delete: jest.fn().mockReturnValue({
-                eq: jest.fn().mockResolvedValue(operations.delete || {})
+            delete: jest.fn<() => any>().mockReturnValue({
+                eq: jest.fn<() => Promise<any>>().mockResolvedValue(operations.delete || {})
             })
         };
     },
@@ -154,9 +154,9 @@ export const testUtils = {
      * 模拟外部服务
      */
     mockExternalServices: (serviceName: string, methods: any) => {
-        const mockService = {};
+        const mockService: Record<string, any> = {};
         Object.keys(methods).forEach(method => {
-            mockService[method] = jest.fn().mockResolvedValue(methods[method]);
+            mockService[method] = jest.fn<() => Promise<any>>().mockResolvedValue(methods[method]);
         });
         return mockService;
     },

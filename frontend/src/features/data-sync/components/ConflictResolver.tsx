@@ -33,24 +33,7 @@ export const ConflictResolver: React.FC<ConflictResolverProps> = ({
         }
     };
 
-    const getEntityDisplayName = (entity: string) => {
-        switch (entity) {
-            case 'trip': return '行程';
-            case 'budget': return '预算';
-            case 'expense': return '支出';
-            case 'user': return '用户';
-            default: return entity;
-        }
-    };
 
-    const formatChangeData = (data: any) => {
-        if (typeof data === 'object' && data !== null) {
-            return Object.entries(data)
-                .map(([key, value]) => `${key}: ${value}`)
-                .join(', ');
-        }
-        return String(data);
-    };
 
     const getChangeDescription = (change: any) => {
         switch (change.type) {

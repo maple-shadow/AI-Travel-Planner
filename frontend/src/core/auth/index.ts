@@ -8,10 +8,10 @@ export type { AuthState, User, LoginCredentials, RegisterData } from './types/au
 export { useAuth, useAuthState, useAuthActions } from './hooks/useAuth';
 
 // 导出组件
-export { default as LoginForm } from './components/LoginForm';
-export { default as RegisterForm } from './components/RegisterForm';
-export { default as AuthStatus } from './components/AuthStatus';
-export { default as ProtectedRoute } from './components/ProtectedRoute';
+export { LoginForm } from './components/LoginForm';
+export { RegisterForm } from './components/RegisterForm';
+export { AuthStatus } from './components/AuthStatus';
+export { ProtectedRoute } from './components/ProtectedRoute';
 
 // 导出认证服务相关
 export { AuthService } from '../../services/auth-service';
@@ -97,10 +97,10 @@ export const AUTH_MODULE_DESCRIPTION = {
 };
 
 // 导入组件用于默认导出
-import LoginForm from './components/LoginForm';
-import RegisterForm from './components/RegisterForm';
-import AuthStatus from './components/AuthStatus';
-import ProtectedRoute from './components/ProtectedRoute';
+import { LoginForm } from './components/LoginForm';
+import { RegisterForm } from './components/RegisterForm';
+import { AuthStatus } from './components/AuthStatus';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuth } from './hooks/useAuth';
 
 export default {

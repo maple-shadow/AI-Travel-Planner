@@ -1,5 +1,5 @@
 import { BudgetAnalysisRequest, BudgetAnalysisResponse, AIError, AIServiceStatus } from '../types/ai.types';
-import AliyunAIClient from '../clients/aliyun.client';
+import BailianAIClient from '../clients/bailian.client';
 import AIUtils from '../utils/ai.utils';
 
 /**
@@ -7,11 +7,11 @@ import AIUtils from '../utils/ai.utils';
  * 提供智能预算分析和优化建议
  */
 export class AIBudgetService {
-    private aliyunClient: AliyunAIClient;
+    private bailianClient: BailianAIClient;
     private serviceStatus: AIServiceStatus;
 
-    constructor(aliyunConfig: any) {
-        this.aliyunClient = new AliyunAIClient(aliyunConfig);
+    constructor(bailianConfig: any) {
+        this.bailianClient = new BailianAIClient(bailianConfig);
         this.serviceStatus = {
             service: 'budget-analysis',
             status: 'healthy',
@@ -31,7 +31,7 @@ export class AIBudgetService {
             const prompt = AIUtils.buildBudgetAnalysisPrompt(request);
 
             // 调用AI服务
-            const response = await this.aliyunClient.analyzeBudget(prompt, {
+            const response = await this.bailianClient.analyzeBudget(prompt, {
                 temperature: 0.3,
                 max_tokens: 1500
             });
@@ -71,7 +71,7 @@ export class AIBudgetService {
                 `2. 预测的置信度\n` +
                 `3. 主要开销类别分析`;
 
-            const response = await this.aliyunClient.analyzeBudget(prompt, {
+            const response = await this.bailianClient.analyzeBudget(prompt, {
                 temperature: 0.2,
                 max_tokens: 1200
             });
@@ -110,7 +110,7 @@ export class AIBudgetService {
                 `2. 预计节省金额\n` +
                 `3. 具体的优化建议`;
 
-            const response = await this.aliyunClient.analyzeBudget(prompt, {
+            const response = await this.bailianClient.analyzeBudget(prompt, {
                 temperature: 0.4,
                 max_tokens: 1300
             });
@@ -160,9 +160,9 @@ export class AIBudgetService {
                 `2. 风险评估\n` +
                 `3. 具体的预算管理建议`;
 
-            const response = await this.aliyunClient.analyzeBudget(prompt, {
+            const response = await this.bailianClient.analyzeBudget(prompt, {
                 temperature: 0.3,
-                max_tokens: 1100
+                max_tokens: 1400
             });
 
             const result = AIUtils.parseAIResponse<{
@@ -259,7 +259,7 @@ export class AIBudgetService {
      */
     async checkHealth(): Promise<boolean> {
         try {
-            const isHealthy = await this.aliyunClient.checkHealth();
+            const isHealthy = await this.bailianClient.checkHealth();
             this.serviceStatus.status = isHealthy ? 'healthy' : 'unavailable';
             return isHealthy;
         } catch {

@@ -39,7 +39,7 @@ export interface LoginCredentials {
 
 // 注册信息
 export interface RegisterData {
-    name: string;
+    username: string;
     email: string;
     password: string;
     confirmPassword: string;

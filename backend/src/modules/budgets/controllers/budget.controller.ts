@@ -5,33 +5,47 @@ export class BudgetController {
     // 创建预算
     static async createBudget(req: Request, res: Response) {
         try {
+            console.log('=== 预算创建请求开始 ===')
+            console.log('请求头:', JSON.stringify(req.headers, null, 2))
+            console.log('请求体:', JSON.stringify(req.body, null, 2))
+
             const userId = req.user?.id
+            console.log('认证用户ID:', userId)
+
             if (!userId) {
+                console.log('用户未认证错误')
                 return res.status(401).json({
                     success: false,
                     error: '用户未认证'
                 })
             }
 
+            // 优先使用认证中间件中的用户ID，如果请求体中已有user_id则使用请求体中的
             const budgetData = {
                 ...req.body,
-                user_id: userId
+                user_id: req.body.user_id || userId
             }
 
+            console.log('处理后的预算数据:', JSON.stringify(budgetData, null, 2))
+
             const result = await BudgetService.createBudget(budgetData)
+            console.log('BudgetService.createBudget 返回结果:', JSON.stringify(result, null, 2))
 
             if (result.success) {
+                console.log('预算创建成功')
                 return res.status(201).json({
                     success: true,
                     data: result.data
                 })
             } else {
                 if (result.validationErrors && result.validationErrors.length > 0) {
+                    console.log('验证错误:', result.validationErrors)
                     return res.status(400).json({
                         success: false,
                         errors: result.validationErrors
                     })
                 } else {
+                    console.log('业务错误:', result.error)
                     return res.status(400).json({
                         success: false,
                         error: result.error
@@ -39,6 +53,7 @@ export class BudgetController {
                 }
             }
         } catch (error) {
+            console.error('预算创建异常:', error)
             return res.status(500).json({
                 success: false,
                 error: '服务器内部错误'
@@ -119,33 +134,47 @@ export class BudgetController {
     // 添加开销
     static async addExpense(req: Request, res: Response) {
         try {
+            console.log('=== 开销创建请求开始 ===')
+            console.log('请求头:', JSON.stringify(req.headers, null, 2))
+            console.log('请求体:', JSON.stringify(req.body, null, 2))
+
             const userId = req.user?.id
+            console.log('认证用户ID:', userId)
+
             if (!userId) {
+                console.log('用户未认证错误')
                 return res.status(401).json({
                     success: false,
                     error: '用户未认证'
                 })
             }
 
+            // 优先使用认证中间件中的用户ID，如果请求体中已有user_id则使用请求体中的
             const expenseData = {
                 ...req.body,
-                user_id: userId
+                user_id: req.body.user_id || userId
             }
 
+            console.log('处理后的开销数据:', JSON.stringify(expenseData, null, 2))
+
             const result = await BudgetService.addExpense(expenseData)
+            console.log('BudgetService.addExpense 返回结果:', JSON.stringify(result, null, 2))
 
             if (result.success) {
+                console.log('开销创建成功')
                 return res.status(201).json({
                     success: true,
                     data: result.data
                 })
             } else {
                 if (result.validationErrors && result.validationErrors.length > 0) {
+                    console.log('验证错误:', result.validationErrors)
                     return res.status(400).json({
                         success: false,
                         errors: result.validationErrors
                     })
                 } else {
+                    console.log('业务错误:', result.error)
                     return res.status(400).json({
                         success: false,
                         error: result.error
@@ -153,6 +182,7 @@ export class BudgetController {
                 }
             }
         } catch (error) {
+            console.error('开销创建异常:', error)
             return res.status(500).json({
                 success: false,
                 error: '服务器内部错误'
@@ -357,22 +387,52 @@ export class BudgetController {
     }
 
     // 列出用户预算
-    static async listUserBudgets(req: Request, res: Response) {
+    static async listUserBudgets(req: Request, res: Response): Promise<void> {
         try {
             const { user_id } = req.query
+
+            console.log('🔍 开始获取用户预算列表，查询参数:', JSON.stringify(req.query, null, 2))
+
             if (!user_id) {
-                return res.status(400).json({ error: '用户ID不能为空' })
+                console.warn('❌ 用户ID不能为空')
+                res.status(400).json({
+                    success: false,
+                    error: '用户ID不能为空'
+                })
+                return
             }
 
-            const result = await BudgetService.listUserBudgets(user_id as string)
+            console.log(`📋 准备获取用户 ${user_id} 的预算列表`)
 
-            if (!result.success) {
-                return res.status(400).json({ error: result.error })
+            const result = await BudgetService.listUserBudgets(user_id as string, req.query)
+
+            console.log('📊 预算服务返回结果:', JSON.stringify({
+                success: result.success,
+                dataLength: result.data ? (Array.isArray(result.data) ? result.data.length : '非数组数据') : '无数据',
+                error: result.error,
+                validationErrors: result.validationErrors
+            }, null, 2))
+
+            if (result.success) {
+                console.log(`✅ 成功获取用户 ${user_id} 的预算列表，共 ${Array.isArray(result.data) ? result.data.length : 0} 条记录`)
+                res.status(200).json({
+                    success: true,
+                    data: result.data
+                })
+            } else {
+                console.warn(`❌ 获取用户 ${user_id} 的预算列表失败:`, result.error)
+                res.status(400).json({
+                    success: false,
+                    error: result.error,
+                    validationErrors: result.validationErrors
+                })
             }
-
-            return res.status(200).json(result.data)
         } catch (error) {
-            return res.status(500).json({ error: '获取用户预算列表失败' })
+            console.error('❌ 获取用户预算列表异常:', error)
+            res.status(500).json({
+                success: false,
+                error: '获取用户预算列表失败'
+            })
         }
     }
 
@@ -442,7 +502,9 @@ export class BudgetController {
             if (limit) options.limit = parseInt(limit as string)
             if (offset) options.offset = parseInt(offset as string)
 
-            const result = await BudgetService.listUserExpenses(userId, options)
+            // 优先使用认证中间件中的用户ID，如果查询参数中有user_id则使用查询参数中的
+            const targetUserId = req.query.user_id as string || userId
+            const result = await BudgetService.listUserExpenses(targetUserId, options)
 
             if (result.success) {
                 return res.status(200).json({

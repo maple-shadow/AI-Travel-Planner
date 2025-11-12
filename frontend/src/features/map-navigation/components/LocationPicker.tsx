@@ -30,10 +30,16 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         setIsSearching(true);
 
         try {
-            // 使用高德地图的搜索API
-            const response = await fetch(
-                `https://restapi.amap.com/v3/place/text?keywords=${encodeURIComponent(query)}&key=${apiKey}&city=全国`
-            );
+            // 使用高德地图的搜索API，添加安全密钥参数
+            const securityKey = import.meta.env.VITE_AMAP_SECURITY_KEY;
+            let url = `https://restapi.amap.com/v3/place/text?keywords=${encodeURIComponent(query)}&key=${apiKey}&city=全国`;
+
+            // 如果配置了安全密钥，添加到URL中
+            if (securityKey) {
+                url += `&sig=${securityKey}`;
+            }
+
+            const response = await fetch(url);
 
             const data = await response.json();
 
@@ -52,6 +58,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
 
                 setSearchResults(results);
             } else {
+                console.warn('地点搜索返回异常:', data);
                 setSearchResults([]);
             }
         } catch (error) {
@@ -92,14 +99,25 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                         lat: position.coords.latitude
                     };
 
-                    // 反向地理编码获取地址
-                    fetch(`https://restapi.amap.com/v3/geocode/regeo?location=${location.lng},${location.lat}&key=${apiKey}`)
+                    // 反向地理编码获取地址，添加安全密钥参数
+                    const securityKey = import.meta.env.VITE_AMAP_SECURITY_KEY;
+                    let url = `https://restapi.amap.com/v3/geocode/regeo?location=${location.lng},${location.lat}&key=${apiKey}`;
+
+                    // 如果配置了安全密钥，添加到URL中
+                    if (securityKey) {
+                        url += `&sig=${securityKey}`;
+                    }
+
+                    fetch(url)
                         .then(response => response.json())
                         .then(data => {
                             if (data.status === '1') {
                                 const address = data.regeocode.formatted_address;
                                 setSearchText(address);
                                 onLocationSelect(location, address);
+                            } else {
+                                console.warn('反向地理编码返回异常:', data);
+                                onLocationSelect(location, '当前位置');
                             }
                         })
                         .catch(error => {

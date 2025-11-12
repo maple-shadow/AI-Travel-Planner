@@ -23,7 +23,7 @@ const config: Config.InitialOptions = {
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
 
     // 模块名称映射
-    moduleNameMapping: {
+    moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
         '^@core/(.*)$': '<rootDir>/src/core/$1',
         '^@modules/(.*)$': '<rootDir>/src/modules/$1',
@@ -123,7 +123,7 @@ const config: Config.InitialOptions = {
     verbose: true,
 
     // 颜色输出
-    colors: true,
+    // colors: true, // Jest 28+ 不再支持此属性
 
     // 测试结果缓存
     cache: true,
@@ -173,10 +173,7 @@ const config: Config.InitialOptions = {
     restoreMocks: true,
 
     // 测试运行前重置模块注册表
-    resetMocks: true,
-
-    // 测试运行前清理模拟调用历史
-    clearMocks: true
+    resetMocks: true
 };
 
 export default config;

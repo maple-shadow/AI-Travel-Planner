@@ -1,7 +1,8 @@
 // 主应用组件
 import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
-import { configureAppStore } from './core/store';
+import { PersistGate } from 'redux-persist/integration/react';
+import { configureAppStore, persistor } from './core/store';
 import RouterConfig from './core/router/RouterConfig';
 import { initializeVoiceRecognition } from './features/voice-recognition';
 import './App.css';
@@ -31,9 +32,11 @@ const App: React.FC = () => {
 
     return (
         <Provider store={store}>
-            <div className="App">
-                <RouterConfig />
-            </div>
+            <PersistGate loading={null} persistor={persistor}>
+                <div className="App">
+                    <RouterConfig />
+                </div>
+            </PersistGate>
         </Provider>
     );
 };

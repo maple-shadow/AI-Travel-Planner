@@ -9,15 +9,26 @@ export const fetchUserProfile = createAsyncThunk<User, void, AsyncThunkConfig>(
     'user/fetchProfile',
     async (_, { rejectWithValue }) => {
         try {
-            // 这里应该调用获取用户详情的API
-            // 暂时返回当前用户信息
-            const user = AuthService.getCurrentUser();
-            if (!user) {
+            // 使用AuthService获取当前用户信息
+            const userData = await AuthService.getCurrentUser();
+
+            if (!userData) {
                 throw new Error('用户未登录');
             }
-            return user;
+
+            // 将后端返回的用户数据转换为前端需要的格式
+            return {
+                id: userData.id,
+                name: userData.username,
+                username: userData.username, // 添加username属性
+                email: userData.email,
+                avatar: userData.avatar || '',
+                role: userData.role || 'user',
+                createdAt: userData.createdAt,
+                updatedAt: userData.updatedAt
+            };
         } catch (error: any) {
-            return rejectWithValue(error.message || '获取用户信息失败');
+            throw rejectWithValue(error.message || '获取用户信息失败');
         }
     }
 );

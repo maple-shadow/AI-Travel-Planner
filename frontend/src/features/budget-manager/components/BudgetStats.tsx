@@ -1,6 +1,15 @@
 // 预算统计组件
 import React from 'react'
 import { BudgetStats as BudgetStatsType, ExpenseStats } from '../types'
+import { Card, Row, Col, Statistic, Typography, Spin, Empty } from 'antd'
+import {
+    PieChartOutlined,
+    CheckCircleOutlined,
+    DollarOutlined,
+    ShoppingOutlined
+} from '@ant-design/icons'
+
+const { Title, Text } = Typography
 
 interface BudgetStatsProps {
     budgetStats?: BudgetStatsType | null
@@ -15,153 +24,163 @@ const BudgetStats: React.FC<BudgetStatsProps> = ({
 }) => {
     if (loading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[...Array(4)].map((_, index) => (
-                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                        <div className="animate-pulse">
-                            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                            <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-                        </div>
-                    </div>
-                ))}
+            <div className="flex justify-center items-center py-12">
+                <Spin size="large" tip="加载中..." />
             </div>
         )
     }
 
     if (!budgetStats) {
         return (
-            <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
-                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">暂无统计数据</h3>
-                <p className="mt-1 text-sm text-gray-500">开始使用预算管理功能后，这里将显示统计信息</p>
-            </div>
+            <Card className="text-center">
+                <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description="暂无统计数据"
+                >
+                    <Text type="secondary">开始使用预算管理功能后，这里将显示统计信息</Text>
+                </Empty>
+            </Card>
         )
     }
 
     return (
         <div className="space-y-6">
             {/* 总体统计 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Row gutter={[16, 16]}>
                 {/* 总预算数 */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                    <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                            <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">总预算数</p>
-                            <p className="text-2xl font-semibold text-gray-900">{budgetStats.total_budgets}</p>
-                        </div>
-                    </div>
-                </div>
+                <Col xs={24} sm={12} lg={6}>
+                    <Card>
+                        <Statistic
+                            title="总预算数"
+                            value={budgetStats.total_budgets}
+                            prefix={<PieChartOutlined style={{ color: '#1890ff' }} />}
+                            valueStyle={{ color: '#3f8600' }}
+                        />
+                    </Card>
+                </Col>
 
                 {/* 活跃预算 */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                    <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                            <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">活跃预算</p>
-                            <p className="text-2xl font-semibold text-gray-900">{budgetStats.active_budgets}</p>
-                        </div>
-                    </div>
-                </div>
+                <Col xs={24} sm={12} lg={6}>
+                    <Card>
+                        <Statistic
+                            title="活跃预算"
+                            value={budgetStats.active_budgets}
+                            prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
+                            valueStyle={{ color: '#3f8600' }}
+                        />
+                    </Card>
+                </Col>
 
                 {/* 总预算金额 */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                    <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                            <svg className="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">总预算金额</p>
-                            <p className="text-2xl font-semibold text-gray-900">¥{budgetStats.total_amount?.toLocaleString()}</p>
-                        </div>
-                    </div>
-                </div>
+                <Col xs={24} sm={12} lg={6}>
+                    <Card>
+                        <Statistic
+                            title="总预算金额"
+                            value={budgetStats.total_amount}
+                            precision={2}
+                            prefix={<DollarOutlined style={{ color: '#faad14' }} />}
+                            valueStyle={{ color: '#cf1322' }}
+                        />
+                    </Card>
+                </Col>
 
                 {/* 已使用金额 */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                    <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">已使用金额</p>
-                            <p className="text-2xl font-semibold text-gray-900">¥{budgetStats.total_used_amount?.toLocaleString()}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <Col xs={24} sm={12} lg={6}>
+                    <Card>
+                        <Statistic
+                            title="已使用金额"
+                            value={budgetStats.total_used_amount}
+                            precision={2}
+                            prefix={<ShoppingOutlined style={{ color: '#ff4d4f' }} />}
+                            valueStyle={{ color: '#cf1322' }}
+                        />
+                    </Card>
+                </Col>
+            </Row>
 
             {/* 开销统计 */}
             {expenseStats && (
-                <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">开销统计</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card title="开销统计" className="mt-6">
+                    <Row gutter={[16, 16]}>
                         {/* 总开销数 */}
-                        <div className="text-center">
-                            <p className="text-sm font-medium text-gray-600">总开销数</p>
-                            <p className="text-2xl font-semibold text-gray-900">{expenseStats.total_expenses}</p>
-                        </div>
+                        <Col xs={24} sm={8}>
+                            <Statistic
+                                title="总开销数"
+                                value={expenseStats.total_expenses}
+                                valueStyle={{ color: '#3f8600' }}
+                            />
+                        </Col>
 
                         {/* 总支出 */}
-                        <div className="text-center">
-                            <p className="text-sm font-medium text-gray-600">总支出</p>
-                            <p className="text-2xl font-semibold text-red-600">¥{expenseStats.total_expense_amount?.toLocaleString()}</p>
-                        </div>
+                        <Col xs={24} sm={8}>
+                            <Statistic
+                                title="总支出"
+                                value={expenseStats.total_expense_amount}
+                                precision={2}
+                                prefix="¥"
+                                valueStyle={{ color: '#cf1322' }}
+                            />
+                        </Col>
 
                         {/* 总收入 */}
-                        <div className="text-center">
-                            <p className="text-sm font-medium text-gray-600">总收入</p>
-                            <p className="text-2xl font-semibold text-green-600">¥{expenseStats.total_income_amount?.toLocaleString()}</p>
-                        </div>
-                    </div>
+                        <Col xs={24} sm={8}>
+                            <Statistic
+                                title="总收入"
+                                value={expenseStats.total_income_amount}
+                                precision={2}
+                                prefix="¥"
+                                valueStyle={{ color: '#3f8600' }}
+                            />
+                        </Col>
+                    </Row>
 
                     {/* 开销分类统计 */}
                     {expenseStats.category_stats && Object.keys(expenseStats.category_stats).length > 0 && (
                         <div className="mt-6">
-                            <h4 className="text-md font-medium text-gray-700 mb-3">分类统计</h4>
-                            <div className="space-y-2">
+                            <Title level={4}>分类统计</Title>
+                            <Row gutter={[8, 8]}>
                                 {Object.entries(expenseStats.category_stats).map(([category, amount]) => (
-                                    <div key={category} className="flex justify-between items-center">
-                                        <span className="text-sm text-gray-600">{category}</span>
-                                        <span className="text-sm font-medium text-gray-900">¥{amount.toLocaleString()}</span>
-                                    </div>
+                                    <Col xs={12} sm={8} md={6} key={category}>
+                                        <Card size="small">
+                                            <Statistic
+                                                title={category}
+                                                value={amount}
+                                                precision={2}
+                                                prefix="¥"
+                                                valueStyle={{ fontSize: '14px' }}
+                                            />
+                                        </Card>
+                                    </Col>
                                 ))}
-                            </div>
+                            </Row>
                         </div>
                     )}
 
                     {/* 月度开销趋势 */}
                     {expenseStats.monthly_stats && Object.keys(expenseStats.monthly_stats).length > 0 && (
                         <div className="mt-6">
-                            <h4 className="text-md font-medium text-gray-700 mb-3">月度开销趋势</h4>
-                            <div className="space-y-2">
+                            <Title level={4}>月度开销趋势</Title>
+                            <Row gutter={[8, 8]}>
                                 {Object.entries(expenseStats.monthly_stats)
                                     .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
                                     .slice(-6) // 显示最近6个月
                                     .map(([month, amount]) => (
-                                        <div key={month} className="flex justify-between items-center">
-                                            <span className="text-sm text-gray-600">{new Date(month).toLocaleDateString('zh-CN', { year: 'numeric', month: 'short' })}</span>
-                                            <span className="text-sm font-medium text-gray-900">¥{amount.toLocaleString()}</span>
-                                        </div>
+                                        <Col xs={12} sm={8} md={6} key={month}>
+                                            <Card size="small">
+                                                <Statistic
+                                                    title={new Date(month).toLocaleDateString('zh-CN', { year: 'numeric', month: 'short' })}
+                                                    value={amount}
+                                                    precision={2}
+                                                    prefix="¥"
+                                                    valueStyle={{ fontSize: '14px' }}
+                                                />
+                                            </Card>
+                                        </Col>
                                     ))}
-                            </div>
+                            </Row>
                         </div>
                     )}
-                </div>
+                </Card>
             )}
 
 

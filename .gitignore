@@ -122,6 +122,12 @@ dist
 .DS_Store
 Thumbs.db
 
+# Docker相关文件
+.dockerignore
+Dockerfile*
+*.dockerfile
+docker-compose.override.yml
+
 # Build outputs
 frontend/dist/
 backend/dist/

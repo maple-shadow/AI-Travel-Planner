@@ -18,9 +18,9 @@ export const loginUser = createAsyncThunk<AuthResponse, { email: string; passwor
 );
 
 // 注册thunk
-export const registerUser = createAsyncThunk<AuthResponse, { name: string; email: string; password: string }, AsyncThunkConfig>(
+export const registerUser = createAsyncThunk<AuthResponse, { username: string; email: string; password: string }, AsyncThunkConfig>(
     'auth/register',
-    async (userData: { name: string; email: string; password: string }, { rejectWithValue }) => {
+    async (userData: { username: string; email: string; password: string }, { rejectWithValue }) => {
         try {
             const response = await AuthService.register(userData);
             return response;

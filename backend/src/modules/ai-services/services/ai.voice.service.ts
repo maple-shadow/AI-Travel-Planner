@@ -1,4 +1,4 @@
-import { VoiceRecognitionRequest, VoiceRecognitionResponse, AIError, AIServiceStatus } from '../types/ai.types';
+import { VoiceRecognitionRequest, VoiceRecognitionResponse, AIError, AIServiceStatus, RealtimeTranscriptionResult } from '../types/ai.types';
 import IflytekAIClient from '../clients/iflytek.client';
 import AIUtils from '../utils/ai.utils';
 
@@ -27,17 +27,25 @@ export class AIVoiceService {
         const startTime = Date.now();
 
         try {
+            console.log('开始语音转文字处理，音频数据大小:', request.audioData.length, '字节');
+            console.log('音频格式:', request.audioFormat);
+            console.log('目标语言:', request.language);
+
             // 调用语音识别服务
             const text = await this.iflytekClient.speechToText(request.audioData, request.audioFormat);
+            console.log('讯飞API返回的原始文本:', text);
 
             // 计算音频时长（估算）
             const duration = this.estimateAudioDuration(request.audioData.length, request.audioFormat);
+            console.log('估算音频时长:', duration, '秒');
 
             // 计算置信度（基于文本长度和复杂度估算）
             const confidence = this.calculateConfidence(text);
+            console.log('计算置信度:', confidence);
 
             // 更新服务状态
             this.updateServiceStatus(Date.now() - startTime, 'healthy');
+            console.log('语音转文字处理完成，耗时:', Date.now() - startTime, '毫秒');
 
             return {
                 text,
@@ -46,6 +54,7 @@ export class AIVoiceService {
                 duration
             };
         } catch (error) {
+            console.error('语音转文字服务处理失败:', error);
             this.updateServiceStatus(Date.now() - startTime, 'degraded');
             throw AIUtils.formatError(error);
         }
@@ -67,6 +76,36 @@ export class AIVoiceService {
             return audioData;
         } catch (error) {
             this.updateServiceStatus(Date.now() - startTime, 'degraded');
+            throw AIUtils.formatError(error);
+        }
+    }
+
+    /**
+     * 实时语音识别
+     */
+    async transcribeSpeechRealtime(audioStream: AsyncIterable<Buffer>): Promise<AsyncIterable<RealtimeTranscriptionResult>> {
+        try {
+            const results = await this.iflytekClient.realtimeSpeechToText(audioStream);
+
+            return (async function* () {
+                for await (const text of results) {
+                    yield {
+                        text,
+                        confidence: 0.9, // 实时识别置信度
+                        isFinal: false,
+                        timestamp: new Date()
+                    };
+                }
+
+                // 发送最终结果
+                yield {
+                    text: '',
+                    confidence: 1.0,
+                    isFinal: true,
+                    timestamp: new Date()
+                };
+            })();
+        } catch (error) {
             throw AIUtils.formatError(error);
         }
     }

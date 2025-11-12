@@ -1,5 +1,5 @@
 import { TripPlanningRequest, TripPlanningResponse, AIError, AIServiceStatus } from '../types/ai.types';
-import AliyunAIClient from '../clients/aliyun.client';
+import BailianAIClient from '../clients/bailian.client';
 import AIUtils from '../utils/ai.utils';
 
 /**
@@ -7,11 +7,11 @@ import AIUtils from '../utils/ai.utils';
  * 提供智能行程规划功能
  */
 export class AITripService {
-    private aliyunClient: AliyunAIClient;
+    private bailianClient: BailianAIClient;
     private serviceStatus: AIServiceStatus;
 
-    constructor(aliyunConfig: any) {
-        this.aliyunClient = new AliyunAIClient(aliyunConfig);
+    constructor(bailianConfig: any) {
+        this.bailianClient = new BailianAIClient(bailianConfig);
         this.serviceStatus = {
             service: 'trip-planning',
             status: 'healthy',
@@ -31,7 +31,7 @@ export class AITripService {
             const prompt = AIUtils.buildTripPlanningPrompt(request);
 
             // 调用AI服务
-            const response = await this.aliyunClient.generateTripPlan(prompt, {
+            const response = await this.bailianClient.generateTripPlan(prompt, {
                 temperature: 0.7,
                 max_tokens: 2000
             });
@@ -67,7 +67,7 @@ export class AITripService {
                 `- ${optimizationType === 'cost' ? '成本最小化' : ''}` +
                 `- ${optimizationType === 'experience' ? '体验最优化' : ''}`;
 
-            const response = await this.aliyunClient.generateTripPlan(prompt, {
+            const response = await this.bailianClient.generateTripPlan(prompt, {
                 temperature: 0.5,
                 max_tokens: 1500
             });
@@ -97,7 +97,7 @@ export class AITripService {
                 `旅行时长：${duration}天\n\n` +
                 `请推荐适合的活动和体验，每个活动请简要描述。`;
 
-            const response = await this.aliyunClient.generateTripPlan(prompt, {
+            const response = await this.bailianClient.generateTripPlan(prompt, {
                 temperature: 0.8,
                 max_tokens: 1000
             });
@@ -126,7 +126,7 @@ export class AITripService {
                 `${JSON.stringify(historicalTrips, null, 2)}\n\n` +
                 `请分析用户的旅行偏好模式，并提供个性化推荐。`;
 
-            const response = await this.aliyunClient.generateTripPlan(prompt, {
+            const response = await this.bailianClient.generateTripPlan(prompt, {
                 temperature: 0.6,
                 max_tokens: 1200
             });
@@ -224,7 +224,7 @@ export class AITripService {
      */
     async checkHealth(): Promise<boolean> {
         try {
-            const isHealthy = await this.aliyunClient.checkHealth();
+            const isHealthy = await this.bailianClient.checkHealth();
             this.serviceStatus.status = isHealthy ? 'healthy' : 'unavailable';
             return isHealthy;
         } catch {

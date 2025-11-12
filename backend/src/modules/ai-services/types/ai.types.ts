@@ -1,9 +1,8 @@
 // AI服务配置类型
 export interface AIServiceConfig {
-    aliyun: {
-        accessKeyId: string;
-        accessKeySecret: string;
-        endpoint: string;
+    bailian: {
+        apiKey: string;
+        baseURL: string;
     };
     iflytek: {
         appId: string;
@@ -121,6 +120,20 @@ export interface AIError {
     code: string;
     message: string;
     details?: any;
+}
+
+// 实时语音识别结果类型
+export interface RealtimeTranscriptionResult {
+    text: string;
+    confidence: number;
+    isFinal: boolean;
+    timestamp: Date;
+}
+
+// WebSocket消息类型
+export interface WebSocketMessage {
+    type: 'audio' | 'end' | 'transcription' | 'error' | 'complete';
+    data: any;
 }
 
 // AI服务状态类型

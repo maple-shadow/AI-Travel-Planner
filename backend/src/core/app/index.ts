@@ -1,4 +1,5 @@
 import express, { Application, Request, Response, NextFunction } from 'express'
+import expressWs from 'express-ws'
 import cors from 'cors'
 import helmet from 'helmet'
 import compression from 'compression'
@@ -10,7 +11,9 @@ import { authRoutes } from '../../modules/auth/routes/auth.routes'
 import tripRoutes from '../../modules/trips/routes/trip.routes'
 import budgetRoutes from '../../modules/budgets/routes/budget.routes'
 import { AIRoutes } from '../../modules/ai-services/routes/ai.routes'
+import AIController from '../../modules/ai-services/controllers/ai.controller'
 import syncRoutes from '../../modules/data-sync/routes/sync.routes'
+import performanceRoutes from '../../modules/performance-optimization/routes/performance.routes'
 
 // 创建日志记录器
 const logger = createLogger('App')
@@ -31,7 +34,9 @@ declare global {
 // 创建Express应用
 export const createExpressApp = (): Application => {
     const app = express()
-    return app
+    // 启用WebSocket支持
+    const expressWsInstance = expressWs(app)
+    return expressWsInstance.app
 }
 
 // 配置中间件
@@ -91,13 +96,23 @@ export const configureRoutes = (app: Application): void => {
 
     // 挂载AI服务模块路由（需要认证）
     const aiRoutes = new AIRoutes({
-        aliyun: environment.thirdParty.aliyunBailian,
+        bailian: environment.thirdParty.aliyunBailian,
         iflytek: environment.thirdParty.iflytek
     });
     app.use('/api/ai', authMiddleware, aiRoutes.getRoutes())
 
+    // WebSocket路由暂时注释掉，需要修复类型定义问题
+    // const aiController = new AIController({
+    //     bailian: environment.thirdParty.aliyunBailian,
+    //     iflytek: environment.thirdParty.iflytek
+    // });
+    // app.ws('/api/ai/voice/realtime', authMiddleware, aiController.realtimeSpeechTranscription);
+
     // 挂载数据同步模块路由（需要认证）
     app.use('/api/sync', authMiddleware, syncRoutes)
+
+    // 挂载性能优化模块路由（需要认证）
+    app.use('/api', authMiddleware, performanceRoutes)
 
     // 404处理
     app.use('*', (req: Request, res: Response) => {

@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../../core/store';
-import { loadTrips as fetchTrips, deleteTrip } from '../store/tripSlice';
+import { loadTrips, deleteTrip } from '../store/tripSlice';
 import { Trip, TripStatus } from '../types';
 import { TripList, TripForm, TripDetail } from '../components';
 import { useTripActions } from '../hooks';
+import { Card, Typography, Row, Col, Button, Input, Select } from 'antd';
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
+
+const { Title, Text } = Typography;
+const { Option } = Select;
 
 const TripListPage: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -18,15 +23,16 @@ const TripListPage: React.FC = () => {
     const [statusFilter, setStatusFilter] = useState<TripStatus | 'all'>('all');
 
     useEffect(() => {
-        dispatch(fetchTrips());
+        dispatch(loadTrips());
     }, [dispatch]);
 
-    const filteredTrips = trips.filter(trip => {
+    // 确保trips是数组类型，避免filter调用错误
+    const filteredTrips = Array.isArray(trips) ? trips.filter(trip => {
         const matchesSearch = trip.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             trip.destination.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = statusFilter === 'all' || trip.status === statusFilter;
         return matchesSearch && matchesStatus;
-    });
+    }) : [];
 
     const handleCreateTrip = () => {
         setEditingTrip(null);
@@ -81,13 +87,21 @@ const TripListPage: React.FC = () => {
 
     if (viewingTrip) {
         return (
-            <div className="min-h-screen bg-gray-50 py-8">
-                <div className="max-w-4xl mx-auto px-4">
-                    <TripDetail
-                        trip={viewingTrip}
-                        onEdit={() => handleEditTrip(viewingTrip)}
-                        onBack={() => setViewingTrip(null)}
-                    />
+            <div className="min-h-screen flex items-center justify-center" style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                padding: '20px'
+            }}>
+                <div className="w-full max-w-4xl">
+                    <Card style={{
+                        borderRadius: '16px',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+                    }}>
+                        <TripDetail
+                            trip={viewingTrip}
+                            onEdit={() => handleEditTrip(viewingTrip)}
+                            onBack={() => setViewingTrip(null)}
+                        />
+                    </Card>
                 </div>
             </div>
         );
@@ -95,85 +109,122 @@ const TripListPage: React.FC = () => {
 
     if (showForm) {
         return (
-            <div className="min-h-screen bg-gray-50 py-8">
-                <div className="max-w-2xl mx-auto px-4">
-                    <TripForm
-                        trip={editingTrip || undefined}
-                        onSubmit={handleFormSubmit}
-                        onCancel={handleFormCancel}
-                        isLoading={loading}
-                    />
+            <div className="min-h-screen flex items-center justify-center" style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                padding: '20px'
+            }}>
+                <div className="w-full max-w-2xl">
+                    <Card style={{
+                        borderRadius: '16px',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+                    }}>
+                        <TripForm
+                            trip={editingTrip || undefined}
+                            onSubmit={handleFormSubmit}
+                            onCancel={handleFormCancel}
+                            isLoading={loading}
+                        />
+                    </Card>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-7xl mx-auto px-4">
-                {/* 页面标题和操作栏 */}
-                <div className="mb-8">
-                    <div className="flex justify-between items-center mb-6">
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900">我的行程</h1>
-                            <p className="text-gray-600 mt-2">管理您的旅行计划</p>
-                        </div>
-                        <button
-                            onClick={handleCreateTrip}
-                            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-                        >
-                            + 创建新行程
-                        </button>
-                    </div>
-
-                    {/* 搜索和筛选栏 */}
-                    <div className="bg-white rounded-lg shadow-sm p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <input
-                                    type="text"
-                                    placeholder="搜索行程标题或目的地..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <select
-                                    value={statusFilter}
-                                    onChange={(e) => setStatusFilter(e.target.value as TripStatus | 'all')}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <div className="min-h-screen flex items-center justify-center" style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            padding: '20px'
+        }}>
+            <div className="w-full max-w-7xl">
+                <Card style={{
+                    borderRadius: '16px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+                }}>
+                    {/* 页面标题和操作栏 */}
+                    <div style={{ marginBottom: '32px' }}>
+                        <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+                            <Col>
+                                <Title level={2} style={{ color: '#667eea', marginBottom: '8px' }}>我的行程</Title>
+                                <Text type="secondary">管理您的旅行计划</Text>
+                            </Col>
+                            <Col>
+                                <Button
+                                    type="primary"
+                                    size="large"
+                                    icon={<PlusOutlined />}
+                                    onClick={handleCreateTrip}
+                                    style={{ borderRadius: '8px' }}
                                 >
-                                    <option value="all">所有状态</option>
-                                    <option value={TripStatus.PLANNING}>规划中</option>
-                                    <option value={TripStatus.IN_PROGRESS}>进行中</option>
-                                    <option value={TripStatus.COMPLETED}>已完成</option>
-                                    <option value={TripStatus.CANCELLED}>已取消</option>
-                                </select>
-                            </div>
-                            <div className="text-sm text-gray-500 flex items-center">
-                                共 {filteredTrips.length} 个行程
-                            </div>
+                                    创建新行程
+                                </Button>
+                            </Col>
+                        </Row>
+
+                        {/* 搜索和筛选栏 */}
+                        <Card styles={{ body: { padding: '20px' } }}>
+                            <Row gutter={[16, 16]}>
+                                <Col xs={24} sm={12} md={8}>
+                                    <Input
+                                        placeholder="搜索行程标题或目的地..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        prefix={<SearchOutlined />}
+                                        size="large"
+                                        style={{ borderRadius: '8px' }}
+                                    />
+                                </Col>
+                                <Col xs={24} sm={12} md={8}>
+                                    <Select
+                                        value={statusFilter}
+                                        onChange={(value) => setStatusFilter(value as TripStatus | 'all')}
+                                        size="large"
+                                        style={{ width: '100%', borderRadius: '8px' }}
+                                    >
+                                        <Option value="all">所有状态</Option>
+                                        <Option value={TripStatus.PLANNING}>规划中</Option>
+                                        <Option value={TripStatus.IN_PROGRESS}>进行中</Option>
+                                        <Option value={TripStatus.COMPLETED}>已完成</Option>
+                                        <Option value={TripStatus.CANCELLED}>已取消</Option>
+                                    </Select>
+                                </Col>
+                                <Col xs={24} sm={24} md={8}>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        height: '100%',
+                                        justifyContent: 'center',
+                                        color: '#666'
+                                    }}>
+                                        共 {filteredTrips.length} 个行程
+                                    </div>
+                                </Col>
+                            </Row>
+                        </Card>
+                    </div>
+
+                    {/* 错误提示 */}
+                    {error && (
+                        <div style={{
+                            marginBottom: '16px',
+                            padding: '16px',
+                            backgroundColor: '#fff2f0',
+                            border: '1px solid #ffccc7',
+                            borderRadius: '8px'
+                        }}>
+                            <Text type="danger">{error}</Text>
                         </div>
-                    </div>
-                </div>
+                    )}
 
-                {/* 错误提示 */}
-                {error && (
-                    <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-                        <p className="text-red-700">{error}</p>
-                    </div>
-                )}
-
-                {/* 行程列表 */}
-                <TripList
-                    trips={filteredTrips}
-                    onEditTrip={handleEditTrip}
-                    onDeleteTrip={handleDeleteTrip}
-                    onDuplicateTrip={handleDuplicateTrip}
-                    onViewTrip={handleViewTrip}
-                    isLoading={loading && trips.length === 0}
-                />
+                    {/* 行程列表 */}
+                    <TripList
+                        trips={filteredTrips}
+                        onEditTrip={handleEditTrip}
+                        onDeleteTrip={handleDeleteTrip}
+                        onDuplicateTrip={handleDuplicateTrip}
+                        onViewTrip={handleViewTrip}
+                        isLoading={loading && trips.length === 0}
+                    />
+                </Card>
             </div>
         </div>
     );

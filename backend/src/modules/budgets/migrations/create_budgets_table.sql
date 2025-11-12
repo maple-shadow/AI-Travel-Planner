@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS budgets (
     category VARCHAR(50) NOT NULL DEFAULT 'general',
     total_amount DECIMAL(15,2) NOT NULL CHECK (total_amount >= 0),
     used_amount DECIMAL(15,2) NOT NULL DEFAULT 0 CHECK (used_amount >= 0),
+    remaining_amount DECIMAL(15,2) NOT NULL DEFAULT 0 CHECK (remaining_amount >= 0),
     currency VARCHAR(3) NOT NULL DEFAULT 'CNY',
     status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'completed', 'cancelled', 'exceeded')),
     start_date DATE NOT NULL,

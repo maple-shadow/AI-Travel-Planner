@@ -200,6 +200,139 @@ class MapService {
     }
 
     /**
+     * 生成静态地图URL
+     * 根据高德地图静态地图API文档：https://lbs.amap.com/api/webservice/guide/api/staticmaps
+     */
+    generateStaticMapUrl(options: {
+        center: Location;
+        zoom?: number;
+        size?: string; // 格式：宽x高，如：400x300
+        markers?: Array<{
+            location: Location;
+            label?: string;
+            color?: string;
+            size?: string;
+        }>;
+        paths?: Array<{
+            color?: string;
+            weight?: number;
+            transparency?: number;
+            locations: Location[];
+        }>;
+        labels?: Array<{
+            content: string;
+            location: Location;
+            font?: number;
+            color?: string;
+        }>;
+    }): string {
+        const baseUrl = 'https://restapi.amap.com/v3/staticmap';
+        const params = new URLSearchParams();
+
+        // 必填参数
+        params.append('key', this.apiKey);
+        params.append('location', `${options.center.lng},${options.center.lat}`);
+
+        // 可选参数
+        if (options.zoom) {
+            params.append('zoom', options.zoom.toString());
+        }
+
+        if (options.size) {
+            params.append('size', options.size);
+        } else {
+            params.append('size', '400x300'); // 默认大小
+        }
+
+        // 标记点
+        if (options.markers && options.markers.length > 0) {
+            const markers = options.markers.map(marker => {
+                let markerStr = `${marker.location.lng},${marker.location.lat}`;
+                if (marker.label) markerStr += `,${marker.label}`;
+                if (marker.color) markerStr += `,${marker.color}`;
+                if (marker.size) markerStr += `,${marker.size}`;
+                return markerStr;
+            }).join('|');
+            params.append('markers', markers);
+        }
+
+        // 路径
+        if (options.paths && options.paths.length > 0) {
+            const paths = options.paths.map(path => {
+                let pathStr = '';
+                if (path.color) pathStr += `${path.color},`;
+                if (path.weight) pathStr += `${path.weight},`;
+                if (path.transparency) pathStr += `${path.transparency},`;
+
+                const locations = path.locations.map(loc => `${loc.lng},${loc.lat}`).join(';');
+                pathStr += locations;
+
+                return pathStr;
+            }).join('|');
+            params.append('paths', paths);
+        }
+
+        // 标签
+        if (options.labels && options.labels.length > 0) {
+            const labels = options.labels.map(label => {
+                let labelStr = label.content;
+                labelStr += `,${label.location.lng},${label.location.lat}`;
+                if (label.font) labelStr += `,${label.font}`;
+                if (label.color) labelStr += `,${label.color}`;
+                return labelStr;
+            }).join('|');
+            params.append('labels', labels);
+        }
+
+        return `${baseUrl}?${params.toString()}`;
+    }
+
+    /**
+     * 生成简单静态地图URL（简化版）
+     */
+    generateSimpleStaticMap(center: Location, zoom: number = 13, size: string = '400x300'): string {
+        return this.generateStaticMapUrl({
+            center,
+            zoom,
+            size
+        });
+    }
+
+    /**
+     * 生成带标记的静态地图URL
+     */
+    generateStaticMapWithMarkers(center: Location, markers: Array<{
+        location: Location;
+        label?: string;
+        color?: string;
+        size?: string;
+    }>, zoom: number = 13, size: string = '400x300'): string {
+        return this.generateStaticMapUrl({
+            center,
+            zoom,
+            size,
+            markers
+        });
+    }
+
+    /**
+     * 生成带路径的静态地图URL
+     */
+    generateStaticMapWithPath(center: Location, path: Array<{
+        color?: string;
+        weight?: number;
+        transparency?: number;
+        locations: Location[];
+    }>, zoom: number = 13, size: string = '400x300'): string {
+        return this.generateStaticMapUrl({
+            center,
+            zoom,
+            size,
+            paths: path
+        });
+    }
+
+    /**
      * 获取城市列表（简化版）
      */
     async getCities(): Promise<string[]> {

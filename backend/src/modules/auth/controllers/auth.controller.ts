@@ -185,4 +185,53 @@ export class AuthController {
             });
         }
     }
+
+    /**
+     * 获取当前用户资料
+     */
+    public getCurrentUser = async (req: Request, res: Response): Promise<void> => {
+        try {
+            // 从认证中间件中获取用户信息
+            const user = req.user;
+
+            if (!user) {
+                res.status(401).json({
+                    success: false,
+                    message: '用户未登录'
+                });
+                return;
+            }
+
+            // 从数据库获取完整的用户信息
+            const userData = await this.authService.findUserById(user.id);
+
+            if (!userData) {
+                res.status(404).json({
+                    success: false,
+                    message: '用户不存在'
+                });
+                return;
+            }
+
+            res.status(200).json({
+                success: true,
+                message: '获取用户资料成功',
+                data: {
+                    user: {
+                        id: userData.id,
+                        username: userData.username,
+                        email: userData.email,
+                        createdAt: userData.createdAt,
+                        updatedAt: userData.updatedAt
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('获取用户资料错误:', error);
+            res.status(500).json({
+                success: false,
+                message: '服务器内部错误'
+            });
+        }
+    }
 }

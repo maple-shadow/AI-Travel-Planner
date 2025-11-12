@@ -180,7 +180,7 @@ const transformLng = (x: number, y: number): number => {
 /**
  * 计算海拔高度（简化版，实际需要调用API）
  */
-export const calculateElevation = async (location: Location): Promise<number> => {
+export const calculateElevation = async (_location: Location): Promise<number> => {
     // 这里可以调用高程API
     // 目前返回固定值
     return 0;
@@ -189,7 +189,7 @@ export const calculateElevation = async (location: Location): Promise<number> =>
 /**
  * 计算日出日落时间
  */
-export const calculateSunTimes = (location: Location, date: Date = new Date()) => {
+export const calculateSunTimes = (_location: Location, date: Date = new Date()) => {
     // 简化版日出日落计算
     const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24);
 

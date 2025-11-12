@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import AMapLoader from '@amap/amap-jsapi-loader';
-import { MapInstance, MapConfig, Location, MapMarker, RouteResult } from '../types/map.types';
+import { MapInstance, Location, MapMarker, RouteResult } from '../types/map.types';
 
 interface UseMapOptions {
     apiKey: string;
@@ -25,13 +25,7 @@ export const useMap = ({
     apiKey,
     initialCenter = { lng: 116.397428, lat: 39.90923 },
     initialZoom = 13,
-    plugins = [
-        'AMap.Geolocation',
-        'AMap.PlaceSearch',
-        'AMap.Driving',
-        'AMap.Marker',
-        'AMap.Polyline'
-    ]
+    plugins = [] // 先不加载任何插件，确保地图能正常显示
 }: UseMapOptions): UseMapReturn => {
     const [map, setMap] = useState<MapInstance | null>(null);
     const [loading, setLoading] = useState(true);
@@ -42,23 +36,28 @@ export const useMap = ({
     useEffect(() => {
         const initializeMap = async () => {
             try {
+                // 加载高德地图API - 参考官方示例的简化配置
                 const AMap = await AMapLoader.load({
                     key: apiKey,
                     version: '2.0',
                     plugins: plugins
                 });
 
-                const mapInstance = new AMap.Map('map-container', {
-                    viewMode: '3D',
-                    zoom: initialZoom,
-                    center: [initialCenter.lng, initialCenter.lat],
-                    mapStyle: 'amap://styles/normal'
-                });
+                // 创建地图容器元素
+                const mapContainer = document.createElement('div');
+                mapContainer.id = 'map-container';
+                mapContainer.style.width = '100%';
+                mapContainer.style.height = '100%';
 
-                // 添加基本控件
-                mapInstance.addControl(new AMap.Zoom());
-                mapInstance.addControl(new AMap.Scale());
-                mapInstance.addControl(new AMap.ToolBar());
+                // 将地图容器添加到body中
+                document.body.appendChild(mapContainer);
+
+                // 创建地图实例 - 使用官方示例的简化配置
+                const mapInstance = new AMap.Map(mapContainer, {
+                    viewMode: '2D', // 使用2D模式，兼容性更好
+                    zoom: initialZoom,
+                    center: [initialCenter.lng, initialCenter.lat]
+                });
 
                 setMap(mapInstance);
                 setLoading(false);
@@ -75,6 +74,11 @@ export const useMap = ({
             if (map) {
                 map.destroy();
             }
+            // 移除地图容器元素
+            const mapContainer = document.getElementById('map-container');
+            if (mapContainer) {
+                mapContainer.remove();
+            }
         };
     }, [apiKey]);
 
@@ -85,8 +89,16 @@ export const useMap = ({
         const AMap = (window as any).AMap;
         if (!AMap) return;
 
+        // 验证标记的经纬度
+        const validPosition = {
+            lng: isNaN(marker.position.lng) ? 116.397428 : marker.position.lng,
+            lat: isNaN(marker.position.lat) ? 39.90923 : marker.position.lat
+        };
+
+        console.log('添加标记坐标:', validPosition);
+
         const markerInstance = new AMap.Marker({
-            position: [marker.position.lng, marker.position.lat],
+            position: [validPosition.lng, validPosition.lat],
             title: marker.title,
             content: marker.content || `<div>${marker.title}</div>`,
             offset: new AMap.Pixel(-13, -30)
@@ -128,7 +140,15 @@ export const useMap = ({
     // 设置地图中心
     const setCenter = useCallback((location: Location) => {
         if (!map) return;
-        map.setCenter([location.lng, location.lat]);
+
+        // 验证经纬度
+        const validLocation = {
+            lng: isNaN(location.lng) ? 116.397428 : location.lng,
+            lat: isNaN(location.lat) ? 39.90923 : location.lat
+        };
+
+        console.log('设置地图中心:', validLocation);
+        map.setCenter([validLocation.lng, validLocation.lat]);
     }, [map]);
 
     // 设置缩放级别
@@ -144,6 +164,19 @@ export const useMap = ({
         const AMap = (window as any).AMap;
         if (!AMap) return null;
 
+        // 验证起点和终点的经纬度
+        const validOrigin = {
+            lng: isNaN(origin.lng) ? 116.397428 : origin.lng,
+            lat: isNaN(origin.lat) ? 39.90923 : origin.lat
+        };
+
+        const validDestination = {
+            lng: isNaN(destination.lng) ? 116.407428 : destination.lng,
+            lat: isNaN(destination.lat) ? 39.91923 : destination.lat
+        };
+
+        console.log('路线规划参数:', { origin: validOrigin, destination: validDestination });
+
         return new Promise((resolve) => {
             const driving = new AMap.Driving({
                 map: map,
@@ -151,8 +184,8 @@ export const useMap = ({
             });
 
             driving.search(
-                [origin.lng, origin.lat],
-                [destination.lng, destination.lat],
+                [validOrigin.lng, validOrigin.lat],
+                [validDestination.lng, validDestination.lat],
                 (status: string, result: any) => {
                     if (status === 'complete' && result.routes && result.routes.length > 0) {
                         const route = result.routes[0];

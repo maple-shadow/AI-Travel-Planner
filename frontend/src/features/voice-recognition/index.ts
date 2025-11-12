@@ -1,219 +1,170 @@
-// 语音识别模块入口文件
-// 导出所有公共API和组件
-
-// 组件导出
-export { default as VoiceRecognition } from './components/VoiceRecognition';
-export { default as VoiceCommandsPanel } from './components/VoiceCommandsPanel';
-export { default as VoiceRecognitionPage } from './pages/VoiceRecognitionPage';
-
-// Hook导出
-export { default as useVoiceRecognition } from './hooks/useVoiceRecognition';
-export { default as useVoiceCommands } from './hooks/useVoiceCommands';
-export { default as useVoiceSynthesis } from './hooks/useVoiceSynthesis';
-export { defaultVoiceCommands } from './hooks/useVoiceCommands';
-
-// 服务导出
-export { default as voiceService } from './services/voiceService';
-
-// 工具函数导出
-export { AudioRecorder, AudioConverter, AudioPlayer, AudioAnalyzer } from './utils/audio.utils';
-export {
-  VoiceCommandProcessor,
-  VoiceIntentAnalyzer,
-  RecognitionResultProcessor,
-  VoiceFeedbackGenerator
-} from './utils/voice.utils';
-
-// 导出所有类型
-export type {
-  // 基础类型
-  VoiceRecognitionState,
-  VoiceCommand,
-  VoiceRecognitionConfig,
-  VoiceSynthesisConfig,
-
-  // 组件Props
-  VoiceRecognitionProps,
-  VoiceCommandsPanelProps,
-
-  // Hook返回类型
-  UseVoiceRecognitionReturn,
-  UseVoiceCommandsReturn,
-  UseVoiceSynthesisReturn,
-
-  // 服务类型
-  VoiceRecognitionRequest,
-  VoiceRecognitionResponse,
-  VoiceSynthesisRequest,
-  VoiceSynthesisResponse,
-
-  // 工具类型
-  VoiceIntentAnalysis,
-  VoiceServiceError
-} from './types/voice.types';
+// Voice recognition feature module
+import useIflytekVoice from './hooks/useIflytekVoice';
+import { voiceService } from './services/voiceService';
+import VOICE_RECOGNITION_CONFIG, {
+    BROWSER_SUPPORT,
+    VOICE_RECOGNITION_STATES,
+    ERROR_MESSAGES,
+    LANGUAGE_CONFIG,
+    DEFAULT_CONFIG
+} from './config/voiceConfig';
+import type {
+    VoiceRecognitionConfig,
+    RecognitionResult,
+    VoiceRecognitionState,
+    UseVoiceRecognitionOptions,
+    UseVoiceRecognitionReturn,
+    WebSocketMessage,
+    AudioChunk
+} from './types';
 
 /**
- * 语音识别模块初始化函数
- * 用于在应用启动时初始化语音识别模块
+ * 语音识别模块主入口
+ * 基于科大讯飞API的实时语音识别功能
  */
-export const initializeVoiceRecognition = async (): Promise<boolean> => {
-  try {
-    console.log('初始化语音识别模块...');
 
-    // 检查浏览器是否支持Web Audio API
-    if (!window.AudioContext) {
-      throw new Error('浏览器不支持Web Audio API');
+export const initializeVoiceRecognition = async (config?: VoiceRecognitionConfig): Promise<boolean> => {
+    console.log('Voice recognition initialized - 科大讯飞语音识别服务');
+
+    // 检查浏览器支持情况
+    const supported = checkBrowserSupport();
+    if (!supported) {
+        console.warn('浏览器不支持语音识别功能');
+        return false;
     }
 
-    // 检查浏览器是否支持MediaRecorder
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      throw new Error('浏览器不支持媒体设备访问');
-    }
-
-    // 检查麦克风权限
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach(track => track.stop());
+        // 初始化语音服务
+        await voiceService.initialize(config);
+        return true;
     } catch (error) {
-      throw new Error('麦克风权限被拒绝或不可用');
+        console.error('语音识别初始化失败:', error);
+        return false;
     }
-
-    console.log('语音识别模块初始化成功');
-    return true;
-  } catch (error) {
-    console.error('语音识别模块初始化失败:', error);
-    return false;
-  }
 };
 
 /**
- * 语音识别模块状态检查
- * 检查模块是否可用
+ * 检查浏览器支持情况
  */
-export const checkVoiceRecognitionStatus = () => {
-  const status = {
-    webAudioAPI: !!window.AudioContext,
-    mediaDevices: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
-    microphonePermission: null as boolean | null
-  };
-
-  // 异步检查麦克风权限
-  if (status.mediaDevices) {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(stream => {
-        stream.getTracks().forEach(track => track.stop());
-        status.microphonePermission = true;
-      })
-      .catch(() => {
-        status.microphonePermission = false;
-      });
-  }
-
-  return status;
+export const checkBrowserSupport = (): boolean => {
+    return BROWSER_SUPPORT.required.webSocket &&
+        BROWSER_SUPPORT.required.mediaDevices &&
+        BROWSER_SUPPORT.required.audioContext;
 };
 
 /**
- * 语音识别模块版本信息
+ * 开始语音识别
  */
-export const VOICE_RECOGNITION_VERSION = '1.0.0';
+export const startVoiceRecognition = async (
+    onResult: (result: RecognitionResult) => void,
+    onError?: (error: string) => void
+) => {
+    try {
+        console.log('Voice recognition started - 连接到科大讯飞语音服务');
 
-export const VOICE_RECOGNITION_FEATURES = [
-  '实时语音识别',
-  '语音命令系统',
-  '文本转语音',
-  '意图分析',
-  '自定义命令',
-  '历史记录',
-  '多语言支持'
-];
+        // 确保服务已初始化
+        if (!voiceService.getStatus().isConnected) {
+            await voiceService.connect(VOICE_RECOGNITION_CONFIG.WS_URL);
+        }
 
-/**
- * 默认语音识别配置
- */
-export const DEFAULT_VOICE_CONFIG = {
-  recognition: {
-    language: 'zh-CN',
-    continuous: false,
-    interimResults: false,
-    maxAlternatives: 1,
-    audioFormat: 'wav' as const
-  },
-  synthesis: {
-    voiceName: 'xiaoyan',
-    speed: 50,
-    volume: 80,
-    pitch: 50
-  }
-};
-
-/**
- * 预定义的语音命令类别
- */
-export const VOICE_COMMAND_CATEGORIES = {
-  NAVIGATION: ['开始录音', '停止录音', '显示命令', '显示识别'],
-  SYSTEM: ['帮助', '清空结果', '清空历史'],
-  TRAVEL: ['计划行程', '查看预算', '搜索目的地', '添加目的地'],
-  UTILITY: ['天气查询', '时间查询', '汇率转换']
-};
-
-/**
- * 语音识别模块使用示例
- */
-export const usageExamples = {
-  basic: `
-import { useVoiceRecognition } from './voice-recognition';
-
-function MyComponent() {
-  const { isListening, recognitionResult, startListening, stopListening } = useVoiceRecognition();
-  
-  return (
-    <div>
-      <button onClick={isListening ? stopListening : startListening}>
-        {isListening ? '停止' : '开始'}录音
-      </button>
-      {recognitionResult && <p>识别结果: {recognitionResult}</p>}
-    </div>
-  );
-}
-  `,
-
-  withCommands: `
-import { useVoiceRecognition, useVoiceCommands } from './voice-recognition';
-
-function MyComponent() {
-  const { recognitionResult } = useVoiceRecognition();
-  const { processVoiceText } = useVoiceCommands();
-  
-  React.useEffect(() => {
-    if (recognitionResult) {
-      const command = processVoiceText(recognitionResult);
-      if (command) {
-        console.log('执行命令:', command);
-      }
+        // 开始识别
+        await voiceService.startRecognition(onResult, onError);
+        return { success: true };
+    } catch (error) {
+        console.error('Failed to start voice recognition:', error);
+        const errorMsg = error instanceof Error ? error.message : '启动语音识别失败';
+        return { success: false, error: errorMsg };
     }
-  }, [recognitionResult, processVoiceText]);
-  
-  return <div>...</div>;
-}
-  `,
-
-  withSynthesis: `
-import { useVoiceSynthesis } from './voice-recognition';
-
-function MyComponent() {
-  const { speak, isSpeaking } = useVoiceSynthesis();
-  
-  const handleSpeak = async () => {
-    await speak('你好，这是一个语音合成示例');
-  };
-  
-  return (
-    <div>
-      <button onClick={handleSpeak} disabled={isSpeaking}>
-        {isSpeaking ? '播放中...' : '播放语音'}
-      </button>
-    </div>
-  );
-}
-  `
 };
+
+/**
+ * 停止语音识别
+ */
+export const stopVoiceRecognition = () => {
+    voiceService.stopRecognition();
+    console.log('Voice recognition stopped');
+};
+
+/**
+ * 断开语音识别服务
+ */
+export const disconnectVoiceRecognition = () => {
+    voiceService.disconnect();
+    console.log('Voice recognition disconnected');
+};
+
+/**
+ * 检查语音识别支持情况
+ */
+export const isVoiceRecognitionSupported = () => {
+    return checkBrowserSupport();
+};
+
+/**
+ * 获取语音识别状态
+ */
+export const getVoiceRecognitionStatus = () => {
+    const status = voiceService.getStatus();
+    return {
+        isSupported: checkBrowserSupport(),
+        isInitialized: true,
+        isConnected: status.isConnected,
+        isProcessing: status.isProcessing,
+        audioChunkCount: status.audioChunkCount,
+        service: '科大讯飞语音识别'
+    };
+};
+
+/**
+ * 获取推荐浏览器信息
+ */
+export const getRecommendedBrowsers = () => {
+    return {
+        browsers: BROWSER_SUPPORT.recommended.browser,
+        versions: BROWSER_SUPPORT.recommended.version
+    };
+};
+
+/**
+ * 获取错误消息
+ */
+export const getErrorMessage = (errorType: keyof typeof ERROR_MESSAGES): string => {
+    return ERROR_MESSAGES[errorType];
+};
+
+/**
+ * 获取语言配置
+ */
+export const getLanguageConfig = () => {
+    return LANGUAGE_CONFIG;
+};
+
+// 导出所有模块
+export {
+    // Hook
+    useIflytekVoice,
+
+    // 服务
+    voiceService,
+
+    // 配置
+    VOICE_RECOGNITION_CONFIG,
+    BROWSER_SUPPORT,
+    VOICE_RECOGNITION_STATES,
+    ERROR_MESSAGES,
+    LANGUAGE_CONFIG,
+    DEFAULT_CONFIG
+};
+
+// 导出类型
+export type {
+    VoiceRecognitionConfig,
+    RecognitionResult,
+    VoiceRecognitionState,
+    UseVoiceRecognitionOptions,
+    UseVoiceRecognitionReturn,
+    WebSocketMessage,
+    AudioChunk
+};
+
+export default useIflytekVoice;

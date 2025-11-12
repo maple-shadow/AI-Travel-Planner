@@ -102,6 +102,13 @@ export class AuthRoutes {
                 });
             }
         );
+
+        // 获取当前用户资料
+        this.router.get(
+            '/me',
+            this.authMiddleware.authenticateToken,
+            this.authController.getCurrentUser
+        );
     }
 
     /**

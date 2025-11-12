@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { WebSocket } from 'ws';
 import { AITripService } from '../services/ai.trip.service';
 import { AIBudgetService } from '../services/ai.budget.service';
 import { AIVoiceService } from '../services/ai.voice.service';
@@ -14,8 +15,8 @@ export class AIController {
     private voiceService: AIVoiceService;
 
     constructor(aiConfig: any) {
-        this.tripService = new AITripService(aiConfig.aliyun);
-        this.budgetService = new AIBudgetService(aiConfig.aliyun);
+        this.tripService = new AITripService(aiConfig.bailian);
+        this.budgetService = new AIBudgetService(aiConfig.bailian);
         this.voiceService = new AIVoiceService(aiConfig.iflytek);
     }
 
@@ -127,7 +128,12 @@ export class AIController {
         try {
             const { audioData, audioFormat = 'wav', language = 'zh_cn' } = req.body;
 
+            console.log('收到语音转文字请求，音频数据长度:', audioData?.length || 0);
+            console.log('音频格式:', audioFormat);
+            console.log('语言:', language);
+
             if (!audioData) {
+                console.error('语音转文字失败：缺少音频数据');
                 res.status(400).json({
                     error: '缺少必要的参数：audioData'
                 });
@@ -136,6 +142,7 @@ export class AIController {
 
             // 将base64字符串转换为Buffer
             const audioBuffer = Buffer.from(audioData, 'base64');
+            console.log('音频Buffer长度:', audioBuffer.length, '字节');
 
             const result = await this.voiceService.transcribeSpeech({
                 audioData: audioBuffer,
@@ -143,11 +150,16 @@ export class AIController {
                 language
             });
 
+            console.log('语音识别成功，识别结果:', result.text);
+            console.log('置信度:', result.confidence);
+            console.log('音频时长:', result.duration, '秒');
+
             res.json({
                 success: true,
                 data: result
             });
         } catch (error) {
+            console.error('语音转文字处理失败:', error);
             this.handleError(res, error, '语音转文本失败');
         }
     };
@@ -181,6 +193,96 @@ export class AIController {
             this.handleError(res, error, '文本转语音失败');
         }
     };
+
+    /**
+     * 实时语音识别（WebSocket）
+     */
+    realtimeSpeechTranscription = async (ws: WebSocket, req: Request): Promise<void> => {
+        try {
+            console.log('WebSocket连接建立，开始实时语音识别');
+
+            // 创建音频流生成器
+            const audioStream = this.createAudioStream(ws);
+
+            // 开始实时识别
+            const results = await this.voiceService.transcribeSpeechRealtime(audioStream);
+
+            // 发送识别结果
+            for await (const result of results) {
+                ws.send(JSON.stringify({
+                    type: 'transcription',
+                    data: result
+                }));
+
+                if (result.isFinal) {
+                    break;
+                }
+            }
+
+            ws.send(JSON.stringify({
+                type: 'complete',
+                data: { message: '语音识别完成' }
+            }));
+
+            ws.close();
+        } catch (error) {
+            console.error('实时语音识别失败:', error);
+
+            const errorMessage = error instanceof Error ? error.message : '未知错误';
+
+            ws.send(JSON.stringify({
+                type: 'error',
+                data: { error: errorMessage }
+            }));
+
+            ws.close();
+        }
+    };
+
+    /**
+     * 创建音频流生成器
+     */
+    private createAudioStream(ws: WebSocket): AsyncIterable<Buffer> {
+        return {
+            [Symbol.asyncIterator]: () => ({
+                next: () => new Promise((resolve, reject) => {
+                    const messageHandler = (data: Buffer) => {
+                        try {
+                            const message = JSON.parse(data.toString());
+
+                            if (message.type === 'audio' && message.data) {
+                                const audioBuffer = Buffer.from(message.data, 'base64');
+                                resolve({ value: audioBuffer, done: false });
+                            } else if (message.type === 'end') {
+                                resolve({ value: Buffer.alloc(0), done: true });
+                            }
+                        } catch (error) {
+                            reject(error);
+                        }
+                    };
+
+                    const errorHandler = (error: Error) => {
+                        reject(error);
+                    };
+
+                    const closeHandler = () => {
+                        resolve({ value: undefined, done: true });
+                    };
+
+                    ws.on('message', messageHandler);
+                    ws.on('error', errorHandler);
+                    ws.on('close', closeHandler);
+
+                    // 清理函数
+                    return () => {
+                        ws.off('message', messageHandler);
+                        ws.off('error', errorHandler);
+                        ws.off('close', closeHandler);
+                    };
+                })
+            })
+        };
+    }
 
     /**
      * 分析语音意图

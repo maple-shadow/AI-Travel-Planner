@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS expenses (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    type VARCHAR(50) NOT NULL DEFAULT 'other' CHECK (type IN ('transportation', 'accommodation', 'food', 'entertainment', 'shopping', 'other')),
+    category VARCHAR(50) NOT NULL DEFAULT 'other' CHECK (category IN ('transportation', 'accommodation', 'food', 'entertainment', 'shopping', 'other')),
+    type VARCHAR(50) NOT NULL DEFAULT 'expense' CHECK (type IN ('expense', 'transportation', 'accommodation', 'food', 'entertainment', 'shopping', 'other')),
     amount DECIMAL(15,2) NOT NULL CHECK (amount > 0),
     currency VARCHAR(3) NOT NULL DEFAULT 'CNY',
     expense_date DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -23,6 +24,7 @@ CREATE TABLE IF NOT EXISTS expenses (
 CREATE INDEX IF NOT EXISTS idx_expenses_budget_id ON expenses(budget_id);
 CREATE INDEX IF NOT EXISTS idx_expenses_user_id ON expenses(user_id);
 CREATE INDEX IF NOT EXISTS idx_expenses_type ON expenses(type);
+CREATE INDEX IF NOT EXISTS idx_expenses_category ON expenses(category);
 CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(expense_date);
 CREATE INDEX IF NOT EXISTS idx_expenses_tags ON expenses USING GIN(tags);
 
@@ -31,7 +33,8 @@ ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
 
 -- 创建策略：用户只能访问自己的开销
 CREATE POLICY "用户只能访问自己的开销" ON expenses
-    FOR ALL USING (auth.uid() = user_id);
+    FOR ALL USING (auth.uid()::text = user_id::text)
+    WITH CHECK (auth.uid()::text = user_id::text);
 
 -- 创建更新触发器
 CREATE OR REPLACE FUNCTION update_expenses_updated_at()

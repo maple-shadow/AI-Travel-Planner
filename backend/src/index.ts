@@ -31,6 +31,42 @@ async function bootstrap() {
         try {
             await setupDatabase()
             logger.info('数据库连接成功')
+
+            // 初始化用户表
+            try {
+                const { UserModel } = await import('./modules/auth/models/user.model')
+                await UserModel.ensureTableExists()
+                logger.info('用户表初始化完成')
+            } catch (error) {
+                logger.warn('用户表初始化失败，用户注册功能可能受限:', error)
+            }
+
+            // 初始化预算表
+            try {
+                const { BudgetModel } = await import('./modules/budgets/models/budget.model')
+                await BudgetModel.ensureTableExists()
+                logger.info('预算表初始化完成')
+            } catch (error) {
+                logger.warn('预算表初始化失败，预算功能可能受限:', error)
+            }
+
+            // 初始化开销表
+            try {
+                const { ExpenseModel } = await import('./modules/budgets/models/expense.model')
+                await ExpenseModel.ensureTableExists()
+                logger.info('开销表初始化完成')
+            } catch (error) {
+                logger.warn('开销表初始化失败，开销功能可能受限:', error)
+            }
+
+            // 初始化行程表
+            try {
+                const { initializeTripModule } = await import('./modules/trips')
+                await initializeTripModule()
+                logger.info('行程表初始化完成')
+            } catch (error) {
+                logger.warn('行程表初始化失败，行程功能可能受限:', error)
+            }
         } catch (error) {
             logger.warn('数据库连接失败，应用将继续运行但部分功能可能受限:', error)
         }

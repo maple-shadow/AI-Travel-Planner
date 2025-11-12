@@ -1,9 +1,9 @@
 import bcrypt from 'bcryptjs';
 import { UserCredentials } from '../types/auth.types';
+import { UserModel } from '../models/user.model';
 
 export class AuthService {
     private passwordSaltRounds: number = 12;
-    private userCredentials: Map<string, UserCredentials> = new Map();
 
     /**
      * 密码哈希
@@ -29,16 +29,12 @@ export class AuthService {
     }): Promise<UserCredentials> {
         const hashedPassword = await this.hashPassword(userData.password);
 
-        const user: UserCredentials = {
-            id: this.generateUserId(),
+        const user = await UserModel.createUser({
             username: userData.username,
-            email: userData.email,
             password: hashedPassword,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        };
+            email: userData.email
+        });
 
-        this.userCredentials.set(userData.email, user);
         return user;
     }
 
@@ -46,7 +42,14 @@ export class AuthService {
      * 通过邮箱查找用户
      */
     public async findUserByEmail(email: string): Promise<UserCredentials | null> {
-        return this.userCredentials.get(email) || null;
+        return await UserModel.findUserByEmail(email);
+    }
+
+    /**
+     * 通过ID查找用户
+     */
+    public async findUserById(id: string): Promise<UserCredentials | null> {
+        return await UserModel.findUserById(id);
     }
 
     /**
@@ -70,40 +73,26 @@ export class AuthService {
      * 更新用户信息
      */
     public async updateUser(email: string, updateData: Partial<UserCredentials>): Promise<UserCredentials | null> {
-        const user = await this.findUserByEmail(email);
-        if (!user) {
-            return null;
-        }
-
-        const updatedUser: UserCredentials = {
-            ...user,
-            ...updateData,
-            updatedAt: new Date()
-        };
-
-        this.userCredentials.set(email, updatedUser);
-        return updatedUser;
+        return await UserModel.updateUser(email, updateData);
     }
 
     /**
      * 删除用户
      */
     public async deleteUser(email: string): Promise<boolean> {
-        return this.userCredentials.delete(email);
-    }
-
-    /**
-     * 生成用户ID
-     */
-    private generateUserId(): string {
-        return `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        return await UserModel.deleteUser(email);
     }
 
     /**
      * 获取所有用户（仅用于开发调试）
      */
-    public getAllUsers(): UserCredentials[] {
-        return Array.from(this.userCredentials.values());
+    public async getAllUsers(): Promise<UserCredentials[]> {
+        // 注意：这个方法仅用于开发调试，生产环境应该移除
+        console.warn('getAllUsers方法仅用于开发调试，生产环境应该移除');
+
+        // 由于Supabase没有直接获取所有用户的方法，这里返回空数组
+        // 实际开发中可以通过其他方式实现
+        return [];
     }
 
     /**

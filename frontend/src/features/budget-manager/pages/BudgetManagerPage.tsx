@@ -3,6 +3,12 @@ import React, { useState, useEffect } from 'react'
 import { BudgetData, ExpenseData, CreateBudgetData, UpdateBudgetData, CreateExpenseData, UpdateExpenseData } from '../types'
 import { useBudget, useBudgetStats } from '../hooks'
 import { BudgetList, BudgetForm, ExpenseList, ExpenseForm, BudgetStats } from '../components'
+import { Card, Typography, Button, Space } from 'antd'
+import { DollarOutlined, PlusOutlined, EditOutlined, ArrowLeftOutlined } from '@ant-design/icons'
+import { useAuth } from '../../../core/auth'
+
+
+const { Title, Text } = Typography;
 
 const BudgetManagerPage: React.FC = () => {
     // 状态管理
@@ -13,9 +19,10 @@ const BudgetManagerPage: React.FC = () => {
     // 使用Hooks
     const budgetHook = useBudget()
     const statsHook = useBudgetStats()
+    const { user } = useAuth()
 
-    // 获取当前用户ID（这里需要从认证系统获取）
-    const currentUserId = 'current-user-id' // 实际项目中应该从认证上下文获取
+    // 获取当前用户ID（从认证系统获取）
+    const currentUserId = user?.id || '12345678-1234-1234-1234-123456789abc' // 如果未登录，使用有效的演示UUID
 
     // 加载用户预算列表
     useEffect(() => {
@@ -172,12 +179,19 @@ const BudgetManagerPage: React.FC = () => {
                         <div>
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-xl font-semibold text-gray-900">我的预算</h3>
-                                <button
+                                <Button
+                                    type="primary"
+                                    size="large"
+                                    icon={<PlusOutlined />}
                                     onClick={handleCreateNewBudget}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    style={{
+                                        height: '48px',
+                                        padding: '0 24px',
+                                        fontSize: '16px'
+                                    }}
                                 >
                                     创建新预算
-                                </button>
+                                </Button>
                             </div>
                             <BudgetList
                                 budgets={budgetHook.budgets}
@@ -197,59 +211,88 @@ const BudgetManagerPage: React.FC = () => {
                         {/* 预算详情头部 */}
                         <div className="flex items-center justify-between">
                             <div>
-                                <button
+                                <Button
+                                    type="default"
+                                    size="large"
+                                    icon={<ArrowLeftOutlined />}
                                     onClick={handleBackToOverview}
-                                    className="flex items-center text-blue-600 hover:text-blue-800 mb-2"
+                                    style={{
+                                        height: '48px',
+                                        padding: '0 24px',
+                                        fontSize: '16px',
+                                        marginBottom: '16px'
+                                    }}
                                 >
-                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                    </svg>
                                     返回概览
-                                </button>
-                                <h2 className="text-2xl font-bold text-gray-900">{selectedBudget.title}</h2>
+                                </Button>
+                                <Title level={2} style={{ margin: 0, color: '#1f2937' }}>
+                                    {selectedBudget.title}
+                                </Title>
                                 {selectedBudget.description && (
-                                    <p className="text-gray-600 mt-1">{selectedBudget.description}</p>
+                                    <Text type="secondary" style={{ fontSize: '16px', marginTop: '8px' }}>
+                                        {selectedBudget.description}
+                                    </Text>
                                 )}
                             </div>
                             <div className="flex space-x-2">
-                                <button
+                                <Button
+                                    type="primary"
+                                    size="large"
+                                    icon={<EditOutlined />}
                                     onClick={() => handleEditBudget(selectedBudget)}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    style={{
+                                        height: '48px',
+                                        padding: '0 24px',
+                                        fontSize: '16px'
+                                    }}
                                 >
                                     编辑预算
-                                </button>
-                                <button
+                                </Button>
+                                <Button
+                                    type="primary"
+                                    size="large"
+                                    icon={<PlusOutlined />}
                                     onClick={handleCreateNewExpense}
-                                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    style={{
+                                        height: '48px',
+                                        padding: '0 24px',
+                                        fontSize: '16px'
+                                    }}
                                 >
                                     记录开销
-                                </button>
+                                </Button>
                             </div>
                         </div>
 
                         {/* 预算基本信息 */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                        <Card style={{ borderRadius: '16px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)', padding: '24px' }}>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div>
-                                    <p className="text-sm text-gray-500">总预算</p>
-                                    <p className="text-2xl font-bold text-gray-900">¥{selectedBudget.total_amount?.toLocaleString()}</p>
+                                <div className="text-center">
+                                    <Text type="secondary" style={{ fontSize: '14px' }}>总预算</Text>
+                                    <Title level={3} style={{ margin: '8px 0 0 0', color: '#1f2937' }}>
+                                        ¥{selectedBudget.total_amount?.toLocaleString()}
+                                    </Title>
                                 </div>
-                                <div>
-                                    <p className="text-sm text-gray-500">已使用</p>
-                                    <p className="text-2xl font-bold text-gray-900">¥{(selectedBudget.used_amount || 0).toLocaleString()}</p>
+                                <div className="text-center">
+                                    <Text type="secondary" style={{ fontSize: '14px' }}>已使用</Text>
+                                    <Title level={3} style={{ margin: '8px 0 0 0', color: '#1f2937' }}>
+                                        ¥{(selectedBudget.used_amount || 0).toLocaleString()}
+                                    </Title>
                                 </div>
-                                <div>
-                                    <p className="text-sm text-gray-500">剩余</p>
-                                    <p className="text-2xl font-bold text-green-600">
+                                <div className="text-center">
+                                    <Text type="secondary" style={{ fontSize: '14px' }}>剩余</Text>
+                                    <Title level={3} style={{ margin: '8px 0 0 0', color: '#52c41a' }}>
                                         ¥{((selectedBudget.total_amount || 0) - (selectedBudget.used_amount || 0)).toLocaleString()}
-                                    </p>
+                                    </Title>
                                 </div>
                             </div>
-                        </div>
+                        </Card>
 
                         {/* 开销列表 */}
                         <div>
-                            <h3 className="text-xl font-semibold text-gray-900 mb-4">开销记录</h3>
+                            <Title level={3} style={{ margin: '0 0 16px 0', color: '#1f2937' }}>
+                                开销记录
+                            </Title>
                             <ExpenseList
                                 expenses={budgetHook.expenses}
                                 onEditExpense={handleEditExpense}
@@ -263,17 +306,22 @@ const BudgetManagerPage: React.FC = () => {
             case 'edit-budget':
                 return (
                     <div>
-                        <button
+                        <Button
+                            type="default"
+                            size="large"
+                            icon={<ArrowLeftOutlined />}
                             onClick={() => {
                                 setCurrentView(currentView === 'create-budget' ? 'overview' : 'budget-detail')
                             }}
-                            className="flex items-center text-blue-600 hover:text-blue-800 mb-4"
+                            style={{
+                                height: '48px',
+                                padding: '0 24px',
+                                fontSize: '16px',
+                                marginBottom: '16px'
+                            }}
                         >
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                            </svg>
                             返回
-                        </button>
+                        </Button>
                         <BudgetForm
                             budget={currentView === 'edit-budget' ? selectedBudget : undefined}
                             onSubmit={async (data) => {
@@ -295,17 +343,22 @@ const BudgetManagerPage: React.FC = () => {
             case 'edit-expense':
                 return (
                     <div>
-                        <button
+                        <Button
+                            type="default"
+                            size="large"
+                            icon={<ArrowLeftOutlined />}
                             onClick={() => {
                                 setCurrentView('budget-detail')
                             }}
-                            className="flex items-center text-blue-600 hover:text-blue-800 mb-4"
+                            style={{
+                                height: '48px',
+                                padding: '0 24px',
+                                fontSize: '16px',
+                                marginBottom: '16px'
+                            }}
                         >
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                            </svg>
-                            返回预算详情
-                        </button>
+                            返回
+                        </Button>
                         <ExpenseForm
                             expense={currentView === 'edit-expense' ? selectedExpense : undefined}
                             budgets={budgetHook.budgets}
@@ -330,36 +383,44 @@ const BudgetManagerPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* 页面标题 */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">预算管理</h1>
-                    <p className="text-gray-600 mt-2">管理您的旅行预算和开销记录</p>
-                </div>
-
-                {/* 错误提示 */}
-                {budgetHook.error && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                        <div className="flex items-center">
-                            <svg className="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                            </svg>
-                            <span className="text-red-700">{budgetHook.error}</span>
-                            <button
-                                onClick={budgetHook.clearError}
-                                className="ml-auto text-red-600 hover:text-red-800"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
+        <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+            <div style={{ maxWidth: 1200, width: '100%', padding: '20px' }}>
+                <Card style={{ borderRadius: '16px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)' }}>
+                    {/* 页面标题 */}
+                    <div className="text-center mb-8">
+                        <Title level={2} style={{ margin: 0, color: '#1f2937' }}>
+                            <DollarOutlined style={{ marginRight: 8 }} />
+                            预算管理
+                        </Title>
+                        <Text type="secondary" style={{ fontSize: '16px' }}>管理您的旅行预算和开销</Text>
                     </div>
-                )}
 
-                {/* 主要内容 */}
-                {renderContent()}
+                    {/* 错误提示 - 只显示非预算详情相关的错误 */}
+                    {budgetHook.error && !budgetHook.error.includes('获取预算详情') && (
+                        <div style={{
+                            marginBottom: '16px',
+                            padding: '16px',
+                            backgroundColor: '#fff2f0',
+                            border: '1px solid #ffccc7',
+                            borderRadius: '8px'
+                        }}>
+                            <Space>
+                                <Text type="danger">{budgetHook.error}</Text>
+                                <Button
+                                    type="text"
+                                    size="small"
+                                    onClick={budgetHook.clearError}
+                                    style={{ color: '#ff4d4f' }}
+                                >
+                                    关闭
+                                </Button>
+                            </Space>
+                        </div>
+                    )}
+
+                    {/* 主要内容 */}
+                    {renderContent()}
+                </Card>
             </div>
         </div>
     )

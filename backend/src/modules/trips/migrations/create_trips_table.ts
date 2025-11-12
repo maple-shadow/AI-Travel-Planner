@@ -4,7 +4,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 export const createTripsTableSQL = `
 CREATE TABLE IF NOT EXISTS trips (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title VARCHAR(100) NOT NULL,
   description TEXT,
   destination VARCHAR(200) NOT NULL,

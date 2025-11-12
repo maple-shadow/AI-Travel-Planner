@@ -9,6 +9,23 @@ import { jest } from '@jest/globals';
 process.env.NODE_ENV = 'test';
 
 // 全局测试配置
+interface TestConfig {
+    timeout: number;
+    retryAttempts: number;
+    coverageThreshold: {
+        global: {
+            branches: number;
+            functions: number;
+            lines: number;
+            statements: number;
+        };
+    };
+}
+
+declare global {
+    var testConfig: TestConfig;
+}
+
 global.testConfig = {
     timeout: 10000,
     retryAttempts: 3,

@@ -1,4 +1,4 @@
-import { SyncChange, SyncConflict } from '../types/sync.types';
+import { SyncChange } from '../types/sync.types';
 
 export class SyncUtils {
     // 生成唯一的变更ID

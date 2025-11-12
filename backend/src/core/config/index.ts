@@ -106,11 +106,12 @@ const validatedAuthConfig = {
 const validatedThirdPartyConfig = {
     aliyunBailian: {
         apiKey: envVars.ALIYUN_BAILIAN_API_KEY,
-        secret: envVars.ALIYUN_BAILIAN_SECRET
+        apiSecret: envVars.ALIYUN_BAILIAN_SECRET
     },
     iflytek: {
+        appId: envVars.IFLYTEK_APP_ID,
         apiKey: envVars.IFLYTEK_API_KEY,
-        secret: envVars.IFLYTEK_API_SECRET
+        apiSecret: envVars.IFLYTEK_API_SECRET
     },
     amap: {
         apiKey: envVars.AMAP_API_KEY

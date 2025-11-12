@@ -1,6 +1,6 @@
 // 认证状态Hook
 import { useEffect, useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from '../../../shared/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
     loginUser,
     registerUser,
@@ -45,7 +45,7 @@ export const useAuth = (): UseAuthReturn => {
     const register = useCallback(async (data: RegisterData) => {
         try {
             await dispatch(registerUser({
-                name: data.name,
+                username: data.username,
                 email: data.email,
                 password: data.password
             })).unwrap();

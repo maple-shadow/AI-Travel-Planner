@@ -1,6 +1,12 @@
 // 开销表单组件
 import React, { useState, useEffect } from 'react'
 import { ExpenseData, CreateExpenseData, UpdateExpenseData, ExpenseType, BudgetData, BudgetCategory } from '../types'
+import { Form, Input, Button, Card, Typography, Select, InputNumber, DatePicker, message } from 'antd'
+import dayjs from 'dayjs'
+
+const { Title, Text } = Typography
+const { Option } = Select
+const { TextArea } = Input
 
 interface ExpenseFormProps {
     expense?: ExpenseData | null
@@ -14,253 +20,217 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     expense,
     budgets,
     onSubmit,
-    onCancel,
-    loading = false
+    onCancel
 }) => {
-    const [formData, setFormData] = useState<CreateExpenseData>({
-        title: '',
-        description: '',
-        amount: 0,
-        type: ExpenseType.EXPENSE,
-        category: BudgetCategory.OTHER,
-        date: new Date().toISOString().split('T')[0],
-        budget_id: '',
-        user_id: ''
-    })
-
-    const [errors, setErrors] = useState<Record<string, string>>({})
+    const [form] = Form.useForm()
+    const [submitLoading, setSubmitLoading] = useState(false)
 
     // 如果是编辑模式，填充表单数据
     useEffect(() => {
         if (expense) {
-            setFormData({
+            // 使用dayjs安全地处理日期，避免无效的Date对象
+            let dateValue: dayjs.Dayjs;
+            if (expense.expense_date) {
+                const parsedDate = dayjs(expense.expense_date);
+                dateValue = parsedDate.isValid() ? parsedDate : dayjs();
+            } else {
+                dateValue = dayjs();
+            }
+
+            form.setFieldsValue({
+                title: expense.title,
                 description: expense.description || '',
-                amount: expense.amount || 0,
-                type: expense.type || ExpenseType.EXPENSE,
-                category: expense.category || BudgetCategory.OTHER,
-                date: expense.date ? new Date(expense.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-                budget_id: expense.budget_id || '',
-                user_id: expense.user_id || '',
-                title: expense.title || ''
-            })
+                amount: expense.amount,
+                type: expense.type,
+                category: expense.category,
+                date: dateValue,
+                budget_id: expense.budget_id,
+                user_id: expense.user_id
+            });
+        } else {
+            form.setFieldsValue({
+                date: dayjs(),
+                type: ExpenseType.EXPENSE,
+                category: BudgetCategory.OTHER
+            });
         }
-    }, [expense])
-
-    // 验证表单
-    const validateForm = (): boolean => {
-        const newErrors: Record<string, string> = {}
-
-        if (!formData.description?.trim()) {
-            newErrors.description = '开销描述不能为空'
-        }
-
-        if (formData.amount <= 0) {
-            newErrors.amount = '开销金额必须大于0'
-        }
-
-        if (!formData.budget_id) {
-            newErrors.budget_id = '请选择关联的预算'
-        }
-
-        setErrors(newErrors)
-        return Object.keys(newErrors).length === 0
-    }
-
-    // 处理输入变化
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target
-
-        setFormData(prev => ({
-            ...prev,
-            [name]: name === 'amount' ? parseFloat(value) || 0 : value
-        }))
-
-        // 清除对应字段的错误
-        if (errors[name]) {
-            setErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }))
-        }
-    }
+    }, [expense, form])
 
     // 处理表单提交
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
+    const handleSubmit = async (values: any) => {
+        setSubmitLoading(true);
+        try {
+            // 使用dayjs安全地处理日期转换
+            let expenseDate: string;
+            if (values.date && dayjs.isDayjs(values.date) && values.date.isValid()) {
+                expenseDate = values.date.format('YYYY-MM-DD');
+            } else {
+                expenseDate = dayjs().format('YYYY-MM-DD');
+            }
 
-        if (!validateForm()) {
-            return
+            const submitData = {
+                ...values,
+                expense_date: expenseDate,
+                budget_id: values.budget_id || '',
+                user_id: '' // 实际应用中应该从用户上下文获取
+            };
+
+            // 删除前端使用的date字段，使用后端需要的expense_date字段
+            delete submitData.date;
+
+            await onSubmit(submitData);
+            message.success(expense ? '开销更新成功' : '开销创建成功');
+        } catch (error) {
+            console.error('保存开销失败:', error);
+            message.error('保存开销失败，请重试');
+        } finally {
+            setSubmitLoading(false);
         }
-
-        // 提交数据
-        onSubmit(formData)
-    }
+    };
 
     return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">
-                    {expense ? '编辑开销' : '记录新开销'}
-                </h3>
+        <Card style={{ maxWidth: 600, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <Title level={3}>{expense ? '编辑开销' : '记录开销'}</Title>
+                <Text type="secondary">
+                    {expense ? '修改您的开销信息' : '为您的预算记录新的开销'}
+                </Text>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                {/* 开销描述 */}
-                <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                        开销描述 <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        id="description"
-                        name="description"
-                        value={formData.description}
-                        onChange={handleInputChange}
-                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.description ? 'border-red-300' : 'border-gray-300'
-                            }`}
-                        placeholder="请输入开销描述"
-                    />
-                    {errors.description && (
-                        <p className="mt-1 text-sm text-red-600">{errors.description}</p>
-                    )}
-                </div>
+            <Form
+                form={form}
+                name="expense-form"
+                onFinish={handleSubmit}
+                autoComplete="off"
+                layout="vertical"
+                size="large"
+            >
+                {/* 开销名称 */}
+                <Form.Item
+                    label="开销名称"
+                    name="title"
+                    rules={[
+                        { required: true, message: '请输入开销名称' },
+                        { min: 2, message: '开销名称至少2个字符' },
+                        { max: 50, message: '开销名称不能超过50个字符' }
+                    ]}
+                >
+                    <Input placeholder="请输入开销名称" />
+                </Form.Item>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* 开销描述 */}
+                <Form.Item
+                    label="开销描述"
+                    name="description"
+                    rules={[
+                        { required: true, message: '请输入开销描述' },
+                        { max: 200, message: '开销描述不能超过200个字符' }
+                    ]}
+                >
+                    <TextArea rows={3} placeholder="请输入开销描述" />
+                </Form.Item>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                     {/* 开销金额 */}
-                    <div>
-                        <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
-                            金额 <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <span className="text-gray-500">¥</span>
-                            </div>
-                            <input
-                                type="number"
-                                id="amount"
-                                name="amount"
-                                value={formData.amount}
-                                onChange={handleInputChange}
-                                min="0"
-                                step="0.01"
-                                className={`w-full pl-8 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.amount ? 'border-red-300' : 'border-gray-300'
-                                    }`}
-                                placeholder="0.00"
-                            />
-                        </div>
-                        {errors.amount && (
-                            <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
-                        )}
-                    </div>
+                    <Form.Item
+                        label="开销金额"
+                        name="amount"
+                        rules={[
+                            { required: true, message: '请输入开销金额' },
+                            { type: 'number', min: 0.01, message: '开销金额必须大于0' }
+                        ]}
+                    >
+                        <InputNumber
+                            style={{ width: '100%' }}
+                            formatter={value => `¥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                            parser={value => value!.replace(/¥\s?|(,*)/g, '')}
+                            placeholder="0.00"
+                        />
+                    </Form.Item>
 
                     {/* 开销类型 */}
-                    <div>
-                        <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
-                            类型 <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                            id="type"
-                            name="type"
-                            value={formData.type}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value={ExpenseType.EXPENSE}>支出</option>
-                            <option value={ExpenseType.INCOME}>收入</option>
-                        </select>
-                    </div>
+                    <Form.Item
+                        label="开销类型"
+                        name="type"
+                        rules={[
+                            { required: true, message: '请选择开销类型' }
+                        ]}
+                    >
+                        <Select placeholder="请选择开销类型">
+                            <Option value={ExpenseType.EXPENSE}>支出</Option>
+                            <Option value={ExpenseType.INCOME}>收入</Option>
+                        </Select>
+                    </Form.Item>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                     {/* 开销分类 */}
-                    <div>
-                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-                            分类
-                        </label>
-                        <input
-                            type="text"
-                            id="category"
-                            name="category"
-                            value={formData.category}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="例如：餐饮、交通、住宿等"
-                        />
-                    </div>
+                    <Form.Item
+                        label="开销分类"
+                        name="category"
+                        rules={[
+                            { required: true, message: '请选择开销分类' }
+                        ]}
+                    >
+                        <Select placeholder="请选择开销分类">
+                            <Option value={BudgetCategory.TRAVEL}>旅行</Option>
+                            <Option value={BudgetCategory.FOOD}>餐饮</Option>
+                            <Option value={BudgetCategory.ACCOMMODATION}>住宿</Option>
+                            <Option value={BudgetCategory.TRANSPORTATION}>交通</Option>
+                            <Option value={BudgetCategory.ENTERTAINMENT}>娱乐</Option>
+                            <Option value={BudgetCategory.SHOPPING}>购物</Option>
+                            <Option value={BudgetCategory.OTHER}>其他</Option>
+                        </Select>
+                    </Form.Item>
 
                     {/* 开销日期 */}
-                    <div>
-                        <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
-                            日期 <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="date"
-                            id="date"
-                            name="date"
-                            value={formData.date}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
+                    <Form.Item
+                        label="开销日期"
+                        name="date"
+                        rules={[
+                            { required: true, message: '请选择开销日期' }
+                        ]}
+                    >
+                        <DatePicker style={{ width: '100%' }} />
+                    </Form.Item>
                 </div>
 
                 {/* 关联预算 */}
-                <div>
-                    <label htmlFor="budget_id" className="block text-sm font-medium text-gray-700 mb-1">
-                        关联预算 <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                        id="budget_id"
-                        name="budget_id"
-                        value={formData.budget_id}
-                        onChange={handleInputChange}
-                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.budget_id ? 'border-red-300' : 'border-gray-300'
-                            }`}
-                    >
-                        <option value="">请选择预算</option>
+                <Form.Item
+                    label="关联预算"
+                    name="budget_id"
+                    rules={[
+                        { required: true, message: '请选择关联预算' }
+                    ]}
+                >
+                    <Select placeholder="请选择预算">
                         {budgets.map(budget => (
-                            <option key={budget.id} value={budget.id}>
+                            <Option key={budget.id} value={budget.id}>
                                 {budget.title} (¥{budget.total_amount?.toLocaleString()})
-                            </option>
+                            </Option>
                         ))}
-                    </select>
-                    {errors.budget_id && (
-                        <p className="mt-1 text-sm text-red-600">{errors.budget_id}</p>
-                    )}
-                </div>
-
-
+                    </Select>
+                </Form.Item>
 
                 {/* 按钮组 */}
-                <div className="flex justify-end space-x-3 pt-4">
-                    <button
-                        type="button"
+                <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
+                    <Button
                         onClick={onCancel}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        disabled={loading}
+                        style={{ marginRight: 8 }}
+                        disabled={submitLoading}
                     >
                         取消
-                    </button>
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    </Button>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={submitLoading}
                     >
-                        {loading ? (
-                            <>
-                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                提交中...
-                            </>
-                        ) : (
-                            expense ? '更新开销' : '记录开销'
-                        )}
-                    </button>
-                </div>
-            </form>
-        </div>
+                        {expense ? '更新开销' : '记录开销'}
+                    </Button>
+                </Form.Item>
+            </Form>
+        </Card>
     )
 }
 

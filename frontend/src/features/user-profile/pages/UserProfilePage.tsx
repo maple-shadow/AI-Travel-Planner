@@ -1,7 +1,11 @@
 // 用户资料管理主页面
 import React, { useState, useEffect } from 'react';
+import { Card, Typography, Row, Col, Button, Tabs } from 'antd';
+import { UserOutlined, SettingOutlined } from '@ant-design/icons';
 import { useProfile } from '../hooks';
 import { ProfileAvatar, ProfileDisplay, ProfileForm, SettingsForm } from '../components';
+
+const { Title, Text } = Typography;
 
 const UserProfilePage: React.FC = () => {
     const {
@@ -33,128 +37,148 @@ const UserProfilePage: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">加载中...</p>
-                </div>
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                <Card style={{ maxWidth: 400, width: '100%' }}>
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                        <p className="mt-4 text-gray-600">加载中...</p>
+                    </div>
+                </Card>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="text-red-500 text-lg font-medium">加载失败</div>
-                    <p className="mt-2 text-gray-600">{error}</p>
-                    <button
-                        onClick={fetchUserProfile}
-                        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                        重试
-                    </button>
-                </div>
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                <Card style={{ maxWidth: 400, width: '100%' }}>
+                    <div className="text-center">
+                        <div className="text-red-500 text-lg font-medium">加载失败</div>
+                        <p className="mt-2 text-gray-600">{error}</p>
+                        <Button
+                            type="primary"
+                            size="large"
+                            block
+                            onClick={fetchUserProfile}
+                            className="mt-4"
+                        >
+                            重试
+                        </Button>
+                    </div>
+                </Card>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-                {/* 页面标题 */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">个人中心</h1>
-                    <p className="mt-2 text-gray-600">管理您的个人资料和账户设置</p>
-                </div>
-
-                {/* 标签页导航 */}
-                <div className="mb-8">
-                    <div className="border-b border-gray-200">
-                        <nav className="-mb-px flex space-x-8">
-                            <button
-                                onClick={() => setActiveTab('profile')}
-                                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'profile'
-                                    ? 'border-blue-500 text-blue-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                    }`}
-                            >
-                                个人资料
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('settings')}
-                                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'settings'
-                                    ? 'border-blue-500 text-blue-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                    }`}
-                            >
-                                设置
-                            </button>
-                        </nav>
+        <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+            <div style={{ maxWidth: 1200, width: '100%', padding: '20px' }}>
+                <Card style={{ borderRadius: '12px', boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)' }}>
+                    {/* 页面标题 */}
+                    <div className="text-center mb-8">
+                        <Title level={2} style={{ margin: 0, color: '#1f2937' }}>
+                            <UserOutlined style={{ marginRight: 8 }} />
+                            个人中心
+                        </Title>
+                        <Text type="secondary">管理您的个人资料和账户设置</Text>
                     </div>
-                </div>
 
-                {/* 内容区域 */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* 侧边栏 - 头像和基本信息 */}
-                    <div className="lg:col-span-1">
-                        <div className="bg-white shadow rounded-lg p-6">
-                            <div className="text-center">
-                                <ProfileAvatar size="xl" editable={activeTab === 'profile'} />
-                                <h2 className="mt-4 text-xl font-semibold text-gray-900">
-                                    {userProfile?.name || '用户'}
-                                </h2>
-                                <p className="text-gray-500">{userProfile?.email}</p>
+                    {/* 标签页导航 */}
+                    <Tabs
+                        activeKey={activeTab}
+                        onChange={(key) => setActiveTab(key as 'profile' | 'settings')}
+                        centered
+                        size="large"
+                        items={[
+                            {
+                                key: 'profile',
+                                label: (
+                                    <span>
+                                        <UserOutlined />
+                                        个人资料
+                                    </span>
+                                ),
+                            },
+                            {
+                                key: 'settings',
+                                label: (
+                                    <span>
+                                        <SettingOutlined />
+                                        设置
+                                    </span>
+                                ),
+                            },
+                        ]}
+                    />
 
-                                {/* 会员状态 */}
-                                <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                                    <svg className="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
-                                    普通会员
+                    {/* 内容区域 */}
+                    <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
+                        {/* 侧边栏 - 头像和基本信息 */}
+                        <Col xs={24} lg={8}>
+                            <Card>
+                                <div className="text-center">
+                                    <ProfileAvatar size="xl" editable={activeTab === 'profile'} />
+                                    <Title level={4} style={{ marginTop: 16, marginBottom: 4 }}>
+                                        {userProfile?.name || '用户'}
+                                    </Title>
+                                    <Text type="secondary">{userProfile?.email}</Text>
+
+                                    {/* 会员状态 */}
+                                    <div style={{ marginTop: 16 }}>
+                                        <Button type="primary" size="small" ghost>
+                                            普通会员
+                                        </Button>
+                                    </div>
+
+                                    {/* 统计信息 */}
+                                    <Row gutter={[8, 8]} style={{ marginTop: 24 }}>
+                                        <Col span={8}>
+                                            <div className="text-center">
+                                                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1f2937' }}>
+                                                    {userProfile?.travelCount || 0}
+                                                </div>
+                                                <div style={{ fontSize: '12px', color: '#6b7280' }}>旅行</div>
+                                            </div>
+                                        </Col>
+                                        <Col span={8}>
+                                            <div className="text-center">
+                                                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1f2937' }}>
+                                                    {userProfile?.favoriteCount || 0}
+                                                </div>
+                                                <div style={{ fontSize: '12px', color: '#6b7280' }}>收藏</div>
+                                            </div>
+                                        </Col>
+                                        <Col span={8}>
+                                            <div className="text-center">
+                                                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1f2937' }}>
+                                                    {userProfile?.reviewCount || 0}
+                                                </div>
+                                                <div style={{ fontSize: '12px', color: '#6b7280' }}>评价</div>
+                                            </div>
+                                        </Col>
+                                    </Row>
                                 </div>
+                            </Card>
+                        </Col>
 
-                                {/* 统计信息 */}
-                                <div className="mt-6 grid grid-cols-3 gap-4 text-center">
-                                    <div>
-                                        <div className="text-lg font-semibold text-gray-900">
-                                            {userProfile?.travelCount || 0}
-                                        </div>
-                                        <div className="text-sm text-gray-500">旅行</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-lg font-semibold text-gray-900">
-                                            {userProfile?.favoriteCount || 0}
-                                        </div>
-                                        <div className="text-sm text-gray-500">收藏</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-lg font-semibold text-gray-900">
-                                            {userProfile?.reviewCount || 0}
-                                        </div>
-                                        <div className="text-sm text-gray-500">评价</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 主内容区域 */}
-                    <div className="lg:col-span-2">
-                        {activeTab === 'profile' ? (
-                            <div className="space-y-6">
-                                {/* 资料展示或编辑表单 */}
-                                {isEditing ? (
-                                    <ProfileForm onSave={handleSave} onCancel={handleCancel} />
-                                ) : (
-                                    <ProfileDisplay onEdit={handleEditClick} />
-                                )}
-                            </div>
-                        ) : (
-                            <SettingsForm />
-                        )}
-                    </div>
-                </div>
+                        {/* 主内容区域 */}
+                        <Col xs={24} lg={16}>
+                            {activeTab === 'profile' ? (
+                                <Card>
+                                    {isEditing ? (
+                                        <ProfileForm onSave={handleSave} onCancel={handleCancel} />
+                                    ) : (
+                                        <ProfileDisplay onEdit={handleEditClick} />
+                                    )}
+                                </Card>
+                            ) : (
+                                <Card>
+                                    <SettingsForm />
+                                </Card>
+                            )}
+                        </Col>
+                    </Row>
+                </Card>
             </div>
         </div>
     );
